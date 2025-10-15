@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod:*)",
+      "Bash(wsl:*)",
+      "Bash(where psql)",
+      "Bash(psql:*)",
+      "Bash(curl http://localhost:8080/health)",
+      "Bash(curl:*)",
+      "Read(//d/Program Files/PostgreSQL/17/bin/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

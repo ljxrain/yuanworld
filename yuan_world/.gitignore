@@ -54,3 +54,19 @@ build/
 
 
 
+
+# 生成的图片文件
+public/images/generations/originals/
+public/images/generations/previews/
+
+# 临时备份文件
+*.backup.*
+*.broken
+
+# 环境变量文件
+server/.env
+.env
+
+# PM2配置（包含敏感信息）
+ecosystem.config.js
+

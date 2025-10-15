@@ -71,7 +71,7 @@ const upload = multer({
 class LaoZhangAPIService {
     constructor() {
         this.apiKey = process.env.LAOZHANG_API_KEY;
-        this.apiURL = process.env.LAOZHANG_API_URL || 'https://api.laozhang.ai/v1/chat/completions';
+        this.apiURL = process.env.LAOZHANG_API_URL || 'https://api-cf.laozhang.ai/v1/chat/completions';
     }
 
     async imageToBase64(imagePath) {
@@ -86,7 +86,10 @@ class LaoZhangAPIService {
 
     async submitGenerationTask(userImagePath, idolImageSource, prompt, type = 'preview') {
         try {
+        const apiPerfStart = Date.now();
         const userImageBase64 = await this.imageToBase64(userImagePath);
+        const base64Time = Date.now();
+        console.log(`⏱️ [API细节] 图片转base64耗时: ${base64Time - apiPerfStart}ms`);
 
             // 使用用户提供的原始prompt
             // 业务流程: 用户照片 + 明星照片 + 中文prompt -> 生成两人在一起的新照片
@@ -115,7 +118,15 @@ class LaoZhangAPIService {
                 stream: false,
                 max_tokens: 4096
             };
+            
+            const requestDataSize = JSON.stringify(requestData).length;
+            const prepareTime = Date.now();
+            console.log(`⏱️ [API细节] 准备请求数据耗时: ${prepareTime - base64Time}ms，数据大小: ${(requestDataSize/1024).toFixed(2)}KB`);
+            console.log(`⏱️ [API细节] 🚀 开始发送请求到老张API...`);
 
+            let uploadEndTime = null;
+            let downloadStartTime = null;
+            
             const response = await axios.post(
                 this.apiURL,
                 requestData,
@@ -124,9 +135,29 @@ class LaoZhangAPIService {
                         'Authorization': `Bearer ${this.apiKey}`,
             'Content-Type': 'application/json'
                     },
-                    timeout: 120000
+                    timeout: 120000,
+                    onUploadProgress: (progressEvent) => {
+                        if (progressEvent.loaded === progressEvent.total) {
+                            uploadEndTime = Date.now();
+                            console.log(`⏱️ [API细节] 📤 数据上传完成，上传耗时: ${uploadEndTime - prepareTime}ms`);
+                        }
+                    },
+                    onDownloadProgress: (progressEvent) => {
+                        if (!downloadStartTime) {
+                            downloadStartTime = Date.now();
+                            const processingTime = downloadStartTime - (uploadEndTime || prepareTime);
+                            console.log(`⏱️ [API细节] ⚙️ 老张API开始返回数据，处理耗时: ${processingTime}ms (${(processingTime/1000).toFixed(1)}s)`);
+                        }
+                    }
                 }
             );
+            
+            const responseTime = Date.now();
+            const apiCallDuration = responseTime - prepareTime;
+            const downloadTime = downloadStartTime ? (responseTime - downloadStartTime) : 0;
+            console.log(`⏱️ [API细节] 📥 数据下载完成，下载耗时: ${downloadTime}ms`);
+            console.log(`⏱️ [API细节] ✅ 收到完整响应，总网络请求耗时: ${apiCallDuration}ms (${(apiCallDuration/1000).toFixed(1)}s)`);
+            console.log(`⏱️ [API细节] 📥 响应数据大小: ${response.data ? (JSON.stringify(response.data).length/1024).toFixed(2) + 'KB' : '未知'}`);
 
             if (response.data && response.data.choices && response.data.choices[0]) {
                 const content = response.data.choices[0].message.content;
@@ -182,6 +213,24 @@ class LaoZhangAPIService {
                 }
                 
                 console.log(`✅ 成功提取图片数据，大小: ${imageBase64.length}字节`);
+                
+                const totalTime = Date.now() - apiPerfStart;
+                const uploadTime = uploadEndTime ? (uploadEndTime - prepareTime) : 0;
+                const processingTime = (downloadStartTime && uploadEndTime) ? (downloadStartTime - uploadEndTime) : apiCallDuration;
+                const actualDownloadTime = downloadStartTime ? (responseTime - downloadStartTime) : 0;
+                const parseTime = Date.now() - responseTime;
+                
+                console.log(`⏱️ [API细节] ========== API调用细节汇总 ==========`);
+                console.log(`⏱️ [API细节] 📊 总耗时: ${(totalTime/1000).toFixed(1)}s`);
+                console.log(`⏱️ [API细节] 📊 详细分解：`);
+                console.log(`⏱️ [API细节]    1️⃣ 图片编码(base64): ${base64Time - apiPerfStart}ms`);
+                console.log(`⏱️ [API细节]    2️⃣ 请求数据准备: ${prepareTime - base64Time}ms`);
+                console.log(`⏱️ [API细节]    3️⃣ 📤 上传到老张API: ${uploadTime}ms`);
+                console.log(`⏱️ [API细节]    4️⃣ ⭐ 老张API处理: ${(processingTime/1000).toFixed(1)}s (${Math.round(processingTime/totalTime*100)}%)`);
+                console.log(`⏱️ [API细节]    5️⃣ 📥 下载结果数据: ${actualDownloadTime}ms`);
+                console.log(`⏱️ [API细节]    6️⃣ 结果数据解析: ${parseTime}ms`);
+                console.log(`⏱️ [API细节] ======================================`);
+                
                 return { imageBase64 };
             }
 
@@ -217,11 +266,11 @@ class LaoZhangAPIService {
 
 const laoZhangAPI = new LaoZhangAPIService();
 
-const watermarkText = "源世界AI · 预览图";
+const watermarkText = "博世界AI · 预览图";
 const watermarkSvg = `
 <svg width="400" height="150" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .title { fill: rgba(255,255,255,0.25); font-size: 28px; font-weight: bold; font-family: Arial, sans-serif; dominant-baseline: middle; text-anchor: middle; }
+    .title { fill: rgba(255,255,255,0.45); font-size: 28px; font-weight: bold; font-family: Arial, sans-serif; dominant-baseline: middle; text-anchor: middle; }
   </style>
   <text x="50%" y="50%" class="title">${watermarkText}</text>
 </svg>
@@ -357,6 +406,8 @@ router.post(
 
             // 记录开始时间
             const startTime = Date.now();
+            const perfLog = { start: startTime };
+            console.log("⏱️ [性能监控] ========== 开始生成 ==========");
 
             const generation = await Generation.create({
                 user_id: req.user.id,
@@ -366,23 +417,31 @@ router.post(
                 status: 'processing'
             });
 
+            perfLog.dbCreateEnd = Date.now();
+            console.log(`⏱️ [性能] 数据库创建记录耗时: ${perfLog.dbCreateEnd - perfLog.start}ms`);
             console.log(`[Generation Start] User: ${req.user.email}, Mode: ${creationMode}, ID: ${generation.id}`);
 
             try {
                 console.log(`[Calling API] User image: ${userImage.filename}, Prompt: ${finalPrompt.substring(0, 30)}...`);
                 
+                perfLog.apiStart = Date.now();
+                console.log(`⏱️ [性能] 准备调用API，前置处理耗时: ${perfLog.apiStart - perfLog.dbCreateEnd}ms`);
                 console.log('Submitting generation task...');
                 const apiResult = await laoZhangAPI.submitGenerationTask(
                     userImage.path,
                     idolImageSource,
                     finalPrompt
                 );
+                perfLog.apiEnd = Date.now();
+                console.log(`⏱️ [性能] ⭐ API调用耗时: ${perfLog.apiEnd - perfLog.apiStart}ms (${Math.round((perfLog.apiEnd - perfLog.apiStart)/1000)}s)`);
                 console.log('API call successful, processing result...');
                 
                 const originalFileName = `${uuidv4()}.png`;
                 const originalFilePath = path.join(__dirname, '../../public/images/generations/originals', originalFileName);
                 await ensureDir(path.dirname(originalFilePath));
                 await laoZhangAPI.saveBase64Image(apiResult.imageBase64, originalFilePath);
+                perfLog.imageSaveEnd = Date.now();
+                console.log(`⏱️ [性能] 原图保存耗时: ${perfLog.imageSaveEnd - perfLog.apiEnd}ms`);
 
                 const previewFileName = `${uuidv4()}.jpg`;
                 const previewFilePath = path.join(__dirname, '../../public/images/generations/previews', previewFileName);
@@ -394,8 +453,11 @@ router.post(
                         tile: true,
                         blend: 'over'
                     }])
-                    .jpeg({ quality: 90 })
+                    .jpeg({ quality: 75 })
                     .toFile(previewFilePath);
+                
+                perfLog.watermarkEnd = Date.now();
+                console.log(`⏱️ [性能] 水印添加耗时: ${perfLog.watermarkEnd - perfLog.imageSaveEnd}ms`);
 
                 const previewImageUrl = `/images/generations/previews/${previewFileName}`;
 
@@ -422,8 +484,19 @@ router.post(
 
                 // 重新加载用户数据以获取最新的预览次数
                 await req.user.reload();
+                
+                perfLog.dbSaveEnd = Date.now();
+                console.log(`⏱️ [性能] 数据库更新耗时: ${perfLog.dbSaveEnd - perfLog.watermarkEnd}ms`);
 
                 console.log(`[Generation Complete] ID: ${generation.id}, Time: ${processingTime}s, Mode: ${creationMode}, Remaining: ${req.user.daily_preview_count}`);
+                
+                // 性能汇总
+                console.log(`⏱️ [性能] ========== 性能汇总 ==========`);
+                console.log(`⏱️ [性能] 📊 总耗时: ${processingTime}s`);
+                console.log(`⏱️ [性能] 📊 API调用: ${Math.round((perfLog.apiEnd - perfLog.apiStart)/1000)}s (${Math.round((perfLog.apiEnd - perfLog.apiStart)/(processingTime*1000)*100)}%)`);
+                console.log(`⏱️ [性能] 📊 图片处理: ${Math.round((perfLog.watermarkEnd - perfLog.apiEnd)/1000)}s`);
+                console.log(`⏱️ [性能] 📊 数据库操作: ${Math.round((perfLog.dbCreateEnd - perfLog.start + perfLog.dbSaveEnd - perfLog.watermarkEnd)/1000)}s`);
+                console.log(`⏱️ [性能] ============================`);
 
                 res.json({
                     success: true,

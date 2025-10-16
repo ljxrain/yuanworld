@@ -307,7 +307,11 @@ async function resolveTemplateImageSource(template, field) {
 
     // case 3: local public path (supports with or without leading slash)
     if (value.startsWith('/') || value.match(/\.(png|jpe?g|webp)$/i)) {
-        const relative = value.startsWith('/') ? value : `/${value}`;
+        let relative = value.startsWith('/') ? value : `/${value}`;
+        // 去掉 /yuan/ 前缀（如果存在）
+        if (relative.startsWith('/yuan/')) {
+            relative = relative.substring(5); // 去掉 '/yuan'
+        }
         const imagePath = path.join(__dirname, '../../public', relative);
         return await laoZhangAPI.imageToBase64(imagePath);
     }

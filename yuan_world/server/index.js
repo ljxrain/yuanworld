@@ -15,6 +15,7 @@ const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payment');
 const templateRoutes = require('./routes/templates');
+const userBehaviorRoutes = require('./routes/user-behavior');
 
 // 导入数据库连接
 const { connectDatabase } = require('./config/database');
@@ -88,6 +89,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/before-after', require('./routes/before-after'));
+app.use('/api/user-behavior', userBehaviorRoutes);
 
 // 健康检查端点（用于Docker和负载均衡器）
 app.get('/health', async (req, res) => {

@@ -54,3 +54,10 @@ build/
 
 
 
+
+# 用户生成和上传的图片（不应提交到 git）
+public/images/generations/
+public/images/idols/
+public/images/homepage/
+public/images/偶像图片/
+public/images/before.jpg

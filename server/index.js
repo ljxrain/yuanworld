@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const path = require('path');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/.env' });
 
 // 导入路由
 const authRoutes = require('./routes/auth');
@@ -15,11 +15,15 @@ const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payment');
 const templateRoutes = require('./routes/templates');
+const userBehaviorRoutes = require('./routes/user-behavior');
 
 // 导入数据库连接
 const { connectDatabase } = require('./config/database');
+// 导入定时清理调度器
+const { startCleanupScheduler } = require("./utils/cleanup-scheduler");
 
 const app = express();
+app.set("trust proxy", 1); // 信任Nginx代理
 const PORT = process.env.PORT || 8080;
 
 // 中间件设置 - 开发环境暂时禁用helmet的CSP
@@ -85,6 +89,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/before-after', require('./routes/before-after'));
+app.use('/api/user-behavior', userBehaviorRoutes);
 
 // 健康检查端点（用于Docker和负载均衡器）
 app.get('/health', async (req, res) => {
@@ -191,9 +196,13 @@ const startServer = async () => {
         await connectDatabase();
         console.log('✅ 数据库连接成功');
         
+        // 启动定时清理任务
+        const db = require('./config/database-instance');
+        startCleanupScheduler(db);
+        
         // 启动服务器
         app.listen(PORT, () => {
-            console.log(`🚀 源世界服务器启动成功！`);
+            console.log(`🚀 博世界服务器启动成功！`);
             console.log(`📍 服务器地址: http://localhost:${PORT}`);
             console.log(`🌍 环境: ${process.env.NODE_ENV || 'development'}`);
             console.log(`⏰ 启动时间: ${new Date().toLocaleString('zh-CN')}`);

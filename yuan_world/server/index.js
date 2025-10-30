@@ -202,8 +202,8 @@ const startServer = async () => {
         console.log('✅ 数据库连接成功');
         
         // 启动定时清理任务
-        const db = require('./config/database-instance');
-        startCleanupScheduler(db);
+        const { sequelize } = require('./config/database-instance');
+        startCleanupScheduler(sequelize);
         
         // 启动服务器
         app.listen(PORT, () => {

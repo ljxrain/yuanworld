@@ -4,7 +4,7 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location -Path $ScriptDir
 
 Write-Host "========================================"
-Write-Host "          源世界项目启动脚本 (PowerShell)"
+Write-Host "          博世界项目启动脚本 (PowerShell)"
 Write-Host "========================================"
 Write-Host ""
 
@@ -21,7 +21,7 @@ if (-not (Test-Path "node_modules")) {
     Write-Host ""
 }
 
-Write-Host "🚀 启动源世界服务器..."
+Write-Host "🚀 启动博世界服务器..."
 Write-Host "📍 前端地址: http://localhost:8080"
 Write-Host "📍 API地址: http://localhost:8080/api"
 Write-Host ""

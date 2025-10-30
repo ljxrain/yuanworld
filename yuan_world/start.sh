@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 正在启动源世界应用..."
+echo "🚀 正在启动博世界应用..."
 echo ""
 
 # 检查 PostgreSQL 是否运行

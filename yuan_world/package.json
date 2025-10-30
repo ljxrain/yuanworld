@@ -1,7 +1,7 @@
 {
   "name": "yuan-world",
   "version": "1.0.0",
-  "description": "源世界 - AI生图网站",
+  "description": "博世界 - AI生图网站",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",

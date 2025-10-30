@@ -15,6 +15,7 @@ const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payment');
 const templateRoutes = require('./routes/templates');
+const userBehaviorRoutes = require('./routes/user-behavior');
 
 // 导入数据库连接
 const { connectDatabase } = require('./config/database');
@@ -72,8 +73,8 @@ if (!isDevelopment) {
 }
 
 // 解析请求体
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname, '../public')));
@@ -88,6 +89,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/before-after', require('./routes/before-after'));
+app.use('/api/user-behavior', userBehaviorRoutes);
 
 // 健康检查端点（用于Docker和负载均衡器）
 app.get('/health', async (req, res) => {
@@ -171,7 +173,12 @@ app.use((error, req, res, next) => {
     
     // Multer文件上传错误
     if (error.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ message: '文件大小超过限制' });
+        const fieldName = error.field === 'image' ? '粉丝照片' : error.field === 'idolImage' ? '偶像照片' : '上传文件';
+        console.error(`❌ 文件上传被拒绝 - 字段: ${error.field}, 当前限制: 50MB`);
+        console.error(`   错误详情:`, error);
+        return res.status(400).json({ 
+            message: `${fieldName}文件太大，请压缩后再上传（限制50MB）` 
+        });
     }
     
     // 数据库错误
@@ -195,8 +202,8 @@ const startServer = async () => {
         console.log('✅ 数据库连接成功');
         
         // 启动定时清理任务
-        const db = require('./config/database-instance');
-        startCleanupScheduler(db);
+        const { sequelize } = require('./config/database-instance');
+        startCleanupScheduler(sequelize);
         
         // 启动服务器
         app.listen(PORT, () => {

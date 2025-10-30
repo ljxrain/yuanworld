@@ -1,3 +1,4 @@
+const { sequelize } = require('../config/database');
 const User = require('./User');
 const Generation = require('./Generation');
 const Template = require('./Template');
@@ -46,6 +47,7 @@ Withdrawal.belongsTo(User, {
 });
 
 module.exports = {
+    sequelize,
     User,
     Generation,
     Template,

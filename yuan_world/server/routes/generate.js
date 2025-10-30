@@ -56,7 +56,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage,
     limits: {
-        fileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 10 * 1024 * 1024
+        fileSize: 52428800  // 提升到50MB
     },
     fileFilter: (req, file, cb) => {
         const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
@@ -307,7 +307,11 @@ async function resolveTemplateImageSource(template, field) {
 
     // case 3: local public path (supports with or without leading slash)
     if (value.startsWith('/') || value.match(/\.(png|jpe?g|webp)$/i)) {
-        const relative = value.startsWith('/') ? value : `/${value}`;
+        let relative = value.startsWith('/') ? value : `/${value}`;
+        // 去掉 /yuan/ 前缀（如果存在）
+        if (relative.startsWith('/yuan/')) {
+            relative = relative.substring(5); // 去掉 '/yuan'
+        }
         const imagePath = path.join(__dirname, '../../public', relative);
         return await laoZhangAPI.imageToBase64(imagePath);
     }
@@ -374,7 +378,7 @@ router.post(
                 //     });
                 // }
 
-                finalPrompt = template.prompt;
+                finalPrompt = template.prompt + "\n\nGenerate a high-quality realistic image only. Do not output text, captions, descriptions, or explanations. Output must be an image, not words.";
                 // 生成用图应优先使用 idol_image_url（干净的参考图），缺失时再回退到展示用的 image_path
                 const imageField = template.idol_image_url ? 'idol_image_url' : 'image_path';
                 idolImageSource = await resolveTemplateImageSource(template, imageField);
@@ -388,7 +392,7 @@ router.post(
                     return res.status(400).json({ message: '请上传偶像照片' });
                 }
 
-                finalPrompt = prompt.trim();
+                finalPrompt = prompt.trim() + "\n\nGenerate a high-quality realistic image only. Do not output text, captions, descriptions, or explanations. Output must be an image, not words.";
                 idolImageSource = await laoZhangAPI.imageToBase64(idolImage.path);
                 
                 console.log(`[Freestyle Mode] Custom prompt: ${finalPrompt.substring(0, 50)}...`);

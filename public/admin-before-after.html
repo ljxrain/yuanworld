@@ -323,7 +323,7 @@
             // 加载模板列表
             if (templates.length === 0) {
                 try {
-                    const response = await fetch('/api/templates');
+                    const response = await fetch('/yuan/api/templates');
                     const data = await response.json();
                     templates = Array.isArray(data) ? data : (data.templates || []);
                 } catch (error) {
@@ -382,7 +382,7 @@
                 console.log('✓ Token存在，继续加载案例...');
                 
                 // 加载案例列表
-                const response = await fetch('/api/before-after');
+                const response = await fetch('/yuan/api/before-after');
                 const data = await response.json();
                 cases = Array.isArray(data) ? data : (data.cases || []);
                 
@@ -582,7 +582,7 @@
                 formData.append('image', file);
                 formData.append('type', type);
                 
-                const response = await fetch('/api/before-after/upload', {
+                const response = await fetch('/yuan/api/before-after/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -650,7 +650,7 @@
             });
             
             try {
-                const response = await fetch('/api/before-after', {
+                const response = await fetch('/yuan/api/before-after', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

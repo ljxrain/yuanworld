@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理后台 - 源世界</title>
+    <title>管理后台 - 博世界</title>
     <style>
         :root { --main-color: #90EE90; --dark-bg: #121212; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -85,7 +85,7 @@
     <!-- 侧边栏 -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">源世界 管理后台</div>
+            <div class="sidebar-logo">博世界 管理后台</div>
             <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;" id="adminRole">管理员</div>
         </div>
         
@@ -408,7 +408,7 @@
         // 加载统计数据
         async function loadStats() {
             try {
-                const response = await fetch('/api/admin/stats', {
+                const response = await fetch('/yuan/api/admin/stats', {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -431,7 +431,7 @@
         // 加载用户列表
         async function loadUsers() {
             try {
-                const response = await fetch('/api/admin/users', {
+                const response = await fetch('/yuan/api/admin/users', {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -467,7 +467,7 @@
         // 加载生成记录
         async function loadGenerations() {
             try {
-                const response = await fetch('/api/admin/generations', {
+                const response = await fetch('/yuan/api/admin/generations', {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 

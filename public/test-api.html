@@ -16,7 +16,7 @@
     </style>
 </head>
 <body>
-    <h1>🔧 源世界 API 测试工具</h1>
+    <h1>🔧 博世界 API 测试工具</h1>
     
     <div class="test-section">
         <h2>1. 测试服务器健康状态</h2>
@@ -55,7 +55,7 @@
             resultDiv.className = 'result';
             
             try {
-                const response = await fetch('/api/health');
+                const response = await fetch('/yuan/api/health');
                 const data = await response.json();
                 
                 if (response.ok) {
@@ -80,7 +80,7 @@
             resultDiv.className = 'result';
             
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch('/yuan/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -114,7 +114,7 @@
             resultDiv.className = 'result';
             
             try {
-                const response = await fetch('/api/auth/register', {
+                const response = await fetch('/yuan/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

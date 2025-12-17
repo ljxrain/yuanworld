@@ -268,7 +268,7 @@
                 console.log('✓ Token存在，继续加载模板...');
                 
                 // 加载所有模板（包括管理员可见的完整信息）
-                const templatesRes = await fetch('/api/templates');
+                const templatesRes = await fetch('/yuan/api/templates');
                 const templatesData = await templatesRes.json();
                 templates = Array.isArray(templatesData) ? templatesData : (templatesData.templates || []);
                 
@@ -496,7 +496,7 @@
                 const formData = new FormData();
                 formData.append('idolImage', file);
                 
-                const response = await fetch('/api/generate/upload-idol-image', {
+                const response = await fetch('/yuan/api/generate/upload-idol-image', {
                     method: 'POST',
                     body: formData
                 });
@@ -703,7 +703,7 @@
             
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('/api/templates', {
+                const response = await fetch('/yuan/api/templates', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

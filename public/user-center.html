@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人中心 - 源世界</title>
+    <title>个人中心 - 博世界</title>
     <style>
         :root { --main-color: #90EE90; --dark-bg: #121212; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -85,7 +85,7 @@
     <!-- 导航栏 -->
     <nav>
         <div class="nav-content">
-            <a href="/yuan/index.html" class="logo">源世界</a>
+            <a href="/yuan/index.html" class="logo">博世界</a>
             <div class="nav-links">
                 <a href="/yuan/index.html" class="nav-link">首页</a>
                 <a href="/yuan/gallery.html" class="nav-link">模板中心</a>
@@ -252,6 +252,12 @@
     </div>
     
     <script>
+        // 智能处理图片路径，确保有正确的前缀
+        function fixImagePath(url) {
+            if (!url) return '';
+            if (url.startsWith('/yuan')) return url;
+            return '/yuan' + url;
+        }
         let currentUser = null;
         let currentToken = null;
         let selectedVipMonths = 1;
@@ -274,7 +280,7 @@
         // 加载用户数据
         async function loadUserData() {
             try {
-                const response = await fetch('/api/auth/me', {
+                const response = await fetch('/yuan/api/auth/me', {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -314,7 +320,7 @@
         // 加载作品列表
         async function loadWorks() {
             try {
-                const response = await fetch('/api/user/generations', {
+                const response = await fetch('/yuan/api/user/generations', {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -338,8 +344,8 @@
                     const shortId = work.id.substring(0, 8);
 
                     return `
-                        <div class="work-card" onclick="viewWork('${work.preview_image_url}')">
-                            <img src="${work.preview_image_url}" alt="作品" class="work-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22300%22/%3E%3C/svg%3E'">
+                        <div class="work-card" onclick="viewWork('${fixImagePath(work.preview_image_url)}')">
+                            <img src="${fixImagePath(work.preview_image_url)}" alt="作品" class="work-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22300%22/%3E%3C/svg%3E'">
                             <div class="work-info">
                                 <div class="work-title">作品 #${shortId}</div>
                                 <div class="work-status ${work.is_paid ? 'status-paid' : 'status-preview'}">
@@ -468,6 +474,7 @@
             location.href = 'index.html';
         }
     </script>
+    <script src="/yuan/js/behavior-tracker.js"></script>
 </body>
 </html>
 

@@ -160,7 +160,7 @@
     <!-- 导航栏 -->
     <nav>
         <div class="nav-content">
-            <a href="/yuan/index.html" class="logo">源世界 AI生图</a>
+            <a href="/yuan/index.html" class="logo">博世界 AI生图</a>
             <div class="nav-links">
                 <a href="/yuan/index.html" class="nav-link">首页</a>
                 <a href="/yuan/gallery.html" class="nav-link">模板中心</a>
@@ -257,6 +257,7 @@
                     <span>上传你的照片</span>
                 </h2>
                 <p class="section-desc">上传一张清晰的照片，AI将根据你选择的模板风格进行创作</p>
+                <p class="section-desc" style="color: #ff6600; font-size: 1.1rem; font-weight: bold; margin-top: 12px; text-shadow: 0 0 10px rgba(255,102,0,0.3);">📌 照片要求：✓ 正面清晰大头照 ✓ 五官完整可见 ✓ 光线充足 ✗ 不要侧脸/戴墨镜/模糊照</p>
                 
                 <div class="upload-box" onclick="document.getElementById('templateUserImage').click()">
                     <div class="upload-icon">📸</div>
@@ -291,6 +292,7 @@
                 <!-- 上传用户照片 -->
                     <div class="form-group">
                     <label>1️⃣ 上传你的照片</label>
+                    <p style="color: #ff6600; font-size: 1.1rem; font-weight: bold; margin: 8px 0; text-shadow: 0 0 10px rgba(255,102,0,0.3);">📌 照片要求：✓ 正面清晰大头照 ✓ 五官完整可见 ✓ 光线充足 ✗ 不要侧脸/戴墨镜/模糊照</p>
                     <div class="upload-box" onclick="document.getElementById('freestyleUserImage').click()">
                         <div class="upload-icon">📸</div>
                         <div class="upload-text">点击上传你的照片</div>
@@ -303,6 +305,7 @@
                 <!-- 上传参考图 -->
                     <div class="form-group">
                     <label>2️⃣ 上传参考图（偶像照片/风格参考）</label>
+                    <p style="color: #ff6600; font-size: 1.1rem; font-weight: bold; margin: 8px 0; text-shadow: 0 0 10px rgba(255,102,0,0.3);">📌 偶像照片要求：✓ 高清正面半身照 ✓ 清晰可见 ✓ 姿态自然</p>
                     <div class="upload-box" onclick="document.getElementById('freestyleIdolImage').click()">
                         <div class="upload-icon">🌟</div>
                         <div class="upload-text">点击上传参考图</div>
@@ -315,7 +318,7 @@
                 <!-- 输入Prompt -->
                 <div class="form-group">
                     <label>3️⃣ 描述你想要的效果</label>
-                    <textarea id="freestylePrompt" placeholder="例如：将我的照片和参考图融合，保持参考图的姿势、服装和背景风格，但替换成我的脸部特征。使用柔和的光线，专业摄影质量。" oninput="updateButtons()"></textarea>
+                    <textarea id="freestylePrompt" placeholder="例如：两人十指相扣，轻轻靠在一起，目光深情对视。正面对镜头的半身像，脸部完全保持参考照片一致，画面浪漫温馨。" oninput="updateButtons()"></textarea>
         </div>
                 
                 <div class="btn-group">
@@ -330,10 +333,42 @@
         <div id="resultArea" class="creation-area">
             <!-- 生成中 -->
             <div id="generating" class="section">
-                <h2 style="text-align: center; color: var(--main-color); margin-bottom: 30px;">🎨 AI创作进度</h2>
+                <h2 style="text-align: center; color: var(--main-color); margin-bottom: 30px;">🎨 AI正在创作中</h2>
                 
-                <!-- 进度步骤 -->
-                <div style="max-width: 600px; margin: 0 auto;">
+                <!-- AI创作动画 -->
+                <div id="aiAnimation" style="max-width: 500px; margin: 0 auto 40px; text-align: center;">
+                    <div style="margin: 40px 0;">
+                        <div class="ai-icon" style="font-size: 80px; animation: aiPulse 2s ease-in-out infinite;">🎨</div>
+                    </div>
+                    <p id="aiStatusText" style="font-size: 1.2rem; color: var(--main-color); font-weight: bold; margin-bottom: 15px;">AI正在为您创作...</p>
+                    <p style="font-size: 0.95rem; opacity: 0.8; margin-bottom: 20px;">请稍候片刻，精彩即将呈现</p>
+                    
+                    <!-- 进度条 -->
+                    <div style="width: 100%; max-width: 400px; margin: 0 auto 15px;">
+                        <div style="background: rgba(255,255,255,0.1); border-radius: 20px; height: 8px; overflow: hidden;">
+                            <div id="aiProgressBar" style="height: 100%; background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #FFD93D); background-size: 200% 100%; border-radius: 20px; width: 0%; transition: width 0.5s ease; animation: progressShine 2s linear infinite;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.85rem; opacity: 0.7;">
+                            <span id="progressPercent">0%</span>
+                            <span id="progressTime">预计 30-60 秒</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <style>
+                    @keyframes aiPulse {
+                        0%, 100% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(1.1); opacity: 0.8; }
+                    }
+                    @keyframes progressShine {
+                        0% { background-position: 200% 0; }
+                        100% { background-position: -200% 0; }
+                    }
+                    .progress-step { display: none !important; }
+                </style>
+                
+                <!-- 进度步骤（隐藏但保留功能） -->
+                <div style="max-width: 600px; margin: 0 auto; display: none;">
                     <div class="progress-step" id="step1">
                         <div class="step-icon">⏳</div>
                         <div class="step-content">
@@ -389,9 +424,8 @@
                     </div>
                 </div>
                 
-                <div style="text-align: center; margin-top: 30px; opacity: 0.7;">
+                <div style="text-align: center; margin-top: 30px; opacity: 0.7; display: none;">
                     <p id="overallStatus">正在处理...</p>
-                    <p style="font-size: 0.9rem; margin-top: 10px;">预计需要 30-60 秒</p>
                     </div>
                     </div>
             
@@ -504,7 +538,7 @@
             }
 
             try {
-                const response = await fetch('/api/auth/me', {
+                const response = await fetch('/yuan/api/auth/me', {
                     headers: {
                         'Authorization': `Bearer ${currentToken}`
                     }
@@ -604,7 +638,7 @@
         // 从API加载模板
         async function loadTemplatesFromAPI() {
             try {
-                const response = await fetch('/api/templates');
+                const response = await fetch('/yuan/api/templates');
                 const data = await response.json();
                 allTemplates = Array.isArray(data) ? data : (data.templates || []);
                 
@@ -816,7 +850,7 @@
                 console.log('📤 发送请求到后端API...');
                 console.log('  - Token:', currentToken ? '有' : '无');
                 
-                const response = await fetch('/api/generate/preview', {
+                const response = await fetch('/yuan/api/generate/preview', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${currentToken}`
@@ -947,7 +981,7 @@
                 console.log('  - Prompt:', prompt.substring(0, 50) + '...');
                 console.log('  - Token:', currentToken ? '有' : '无');
                 
-                const response = await fetch('/api/generate/preview', {
+                const response = await fetch('/yuan/api/generate/preview', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${currentToken}`
@@ -1017,6 +1051,8 @@
         }
         
         // 显示生成中
+        let progressInterval = null;
+        
         function showGenerating() {
             document.getElementById('templateMode').classList.remove('active');
             document.getElementById('freestyleMode').classList.remove('active');
@@ -1027,11 +1063,82 @@
             
             // 重置所有步骤
             resetAllSteps();
+            
+            // 启动进度条
+            startProgressBar();
+        }
+        
+        function startProgressBar() {
+            const progressBar = document.getElementById('aiProgressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressTime = document.getElementById('progressTime');
+            const statusText = document.getElementById('aiStatusText');
+            
+            let progress = 0;
+            let elapsedTime = 0;
+            
+            // 清除之前的interval
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            
+            // 重置进度
+            progressBar.style.width = '0%';
+            progressPercent.textContent = '0%';
+            
+            // 每秒更新一次
+            progressInterval = setInterval(() => {
+                elapsedTime++;
+                
+                // 模拟进度增长（前30秒快，后面慢）
+                if (progress < 30) {
+                    progress += 1.5;
+                } else if (progress < 60) {
+                    progress += 0.8;
+                } else if (progress < 85) {
+                    progress += 0.3;
+                } else if (progress < 95) {
+                    progress += 0.1;
+                }
+                
+                progress = Math.min(progress, 95); // 最多到95%
+                progressBar.style.width = progress + '%';
+                progressPercent.textContent = Math.round(progress) + '%';
+                
+                // 更新剩余时间
+                const remaining = Math.max(0, 50 - elapsedTime);
+                progressTime.textContent = `剩余约 ${remaining} 秒`;
+                
+                // 更新提示文字
+                if (progress < 20) {
+                    statusText.textContent = 'AI正在理解您的需求...';
+                } else if (progress < 50) {
+                    statusText.textContent = 'AI正在创作中...';
+                } else if (progress < 80) {
+                    statusText.textContent = 'AI正在精心雕琢细节...';
+                } else {
+                    statusText.textContent = 'AI正在完成最后的润色...';
+                }
+            }, 1000);
+        }
+        
+        function completeProgressBar() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            const progressBar = document.getElementById('aiProgressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const statusText = document.getElementById('aiStatusText');
+            
+            progressBar.style.width = '100%';
+            progressPercent.textContent = '100%';
+            statusText.textContent = '创作完成！';
         }
         
         // 显示生成结果
         async function showResult(data) {
             console.log("Showing result with data:", data);
+            completeProgressBar(); // 完成进度条
             const imageUrl = data.imageUrl || data.previewImageUrl;
             if (!imageUrl) {
                 console.error("showResult called, but no image URL found!", data);
@@ -1100,7 +1207,7 @@
                     registerData.email = email;
                 }
                 
-                const response = await fetch('/api/auth/register', {
+                const response = await fetch('/yuan/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(registerData)
@@ -1193,7 +1300,7 @@
             }
             
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch('/yuan/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ identifier, password })
@@ -1300,7 +1407,7 @@
             }
             
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch('/yuan/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ identifier, password })
@@ -1351,6 +1458,7 @@
             document.getElementById('authTitle').textContent = '登录';
         }
     </script>
+    <script src="/yuan/js/behavior-tracker.js"></script>
 </body>
 </html>
 

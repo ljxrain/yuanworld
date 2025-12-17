@@ -6,7 +6,7 @@ async function testHealth() {
     resultDiv.className = 'result';
     
     try {
-        const response = await fetch('/api/health');
+        const response = await fetch('/yuan/api/health');
         const data = await response.json();
         
         if (response.ok) {
@@ -31,7 +31,7 @@ async function testLogin() {
     resultDiv.className = 'result';
     
     try {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('/yuan/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -65,7 +65,7 @@ async function testRegister() {
     resultDiv.className = 'result';
     
     try {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch('/yuan/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

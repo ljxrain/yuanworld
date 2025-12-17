@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>源世界 - 源动我心，源来是你</title>
+    <link rel="preconnect" href="https://api-cf.laozhang.ai">
+    <link rel="dns-prefetch" href="https://api-cf.laozhang.ai">
+    <title>博世界 - 博动我心，博来是你</title>
     <style>
         :root { --glow-color: rgba(144, 238, 144, 0.7); --glow-color-hard: #90EE90; --bg-color: #000; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -114,7 +116,7 @@
         <!-- 手机导航栏 -->
         <nav style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 15px 20px; border-bottom: 1px solid rgba(144,238,144,0.2);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <a href="/yuan/index.html" style="font-size: 1.3rem; font-weight: bold; background: linear-gradient(135deg, #90EE90, #37B679); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">源世界</a>
+                <a href="/yuan/index.html" style="font-size: 1.3rem; font-weight: bold; background: linear-gradient(135deg, #90EE90, #37B679); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">博世界</a>
                 <button onclick="toggleMobileMenu()" style="background: none; border: none; color: #90EE90; font-size: 1.5rem; cursor: pointer;">☰</button>
             </div>
             <div id="mobileMenu" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(144,238,144,0.2);">
@@ -129,9 +131,9 @@
         <div class="photo-galaxy-mobile" id="photoGalaxyMobile"></div>
         <div class="sticky-content">
             <div>
-                <h1 class="hero-main-slogan">源动我心</h1>
-                <p class="hero-sub-slogan">源和我的世界，即刻开启</p>
-                <a href="/yuan/create.html" class="btn">✨ 一键入源</a>
+                <h1 class="hero-main-slogan">博动我心</h1>
+                <p class="hero-sub-slogan">博和我的世界，即刻开启</p>
+                <a href="/yuan/create.html" class="btn">✨ 一键入博</a>
             </div>
         </div>
     </div>
@@ -140,7 +142,7 @@
         <!-- 导航栏 -->
         <nav style="position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding: 15px 0; border-bottom: 1px solid rgba(144,238,144,0.2);">
             <div style="max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center;">
-                <a href="/yuan/index.html" class="logo" style="position: static; margin: 0;">源世界</a>
+                <a href="/yuan/index.html" class="logo" style="position: static; margin: 0;">博世界</a>
                 <div style="display: flex; gap: 30px; align-items: center;">
                     <a href="/yuan/index.html" style="color: #fff; font-weight: 500; transition: color 0.3s;" onmouseover="this.style.color='#90EE90'" onmouseout="this.style.color='#fff'">首页</a>
                     <a href="/yuan/gallery.html" style="color: #fff; font-weight: 500; transition: color 0.3s;" onmouseover="this.style.color='#90EE90'" onmouseout="this.style.color='#fff'">模板中心</a>
@@ -155,9 +157,9 @@
         <div class="photo-galaxy" id="photoGalaxy"></div>
         <div class="sticky-content">
             <div>
-                <h1 class="hero-main-slogan">源动我心</h1>
-                <p class="hero-sub-slogan">源和我的世界，即刻开启</p>
-                <a href="/yuan/create.html" class="btn">✨ 一键入源</a>
+                <h1 class="hero-main-slogan">博动我心</h1>
+                <p class="hero-sub-slogan">博和我的世界，即刻开启</p>
+                <a href="/yuan/create.html" class="btn">✨ 一键入博</a>
             </div>
         </div>
     </div>
@@ -172,52 +174,25 @@
         async function init3DScene() {
             // 🎨 使用新的图片
             const imageUrls = [
-                "images/偶像图片/Generated Image October 03, 2025 - 10_18PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_20PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_21PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_26PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_28PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_29PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_32PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_35PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_39PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_41PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_43PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_45PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_49PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_50PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_52PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_56PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 10_59PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_04PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_07PM (1).png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_09PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_10PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_12PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_17PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_19PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_20PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_21PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_23PM (2).png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_27PM (1).png",
-                "images/偶像图片/Generated Image October 03, 2025 - 11_41PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 8_40PM.png",
-                "images/偶像图片/Generated Image October 03, 2025 - 8_42PM.png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_01AM (1).png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_01AM.png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_03AM.png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_05AM.png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_07AM (1).png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_07AM.png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_08AM.png",
-                "images/偶像图片/Generated Image October 04, 2025 - 9_11AM.png"
+                "images/homepage/011c9437-ef22-4af7-9990-382a734c52ec.png",
+                "images/homepage/0d53a9e5-ca83-42fa-8b9f-6b1444386294.png",
+                "images/homepage/8ec70c50-a405-429f-af21-026ab0cdcbdd.png",
+                "images/homepage/9489dd67-5c8b-4342-98aa-a5da1339a982.png",
+                "images/homepage/a094dbde-9703-4e79-a569-2dedb0b434d8.png",
+                "images/homepage/c03e5239-53a5-49d8-85fa-cb051916120a.png",
+                "images/homepage/c6846586-1cd1-4010-87eb-02496837e34b.png",
+                "images/homepage/ccf1fed6-9b98-4748-b5dc-0fd78d0aa5bd.png",
+                "images/homepage/cee12823-9992-4be6-9db8-dad97a4019ea.png",
+                "images/homepage/db9b30c9-bcfb-40a5-aa08-c48499c8092e.png",
+                "images/homepage/f6211eb7-7f91-4ecd-be50-ec211e17a6d4.png",
+                "images/homepage/fa18b98a-429b-40fc-bc94-3b4e7972cdc7.png"
             ];
             
             const isMobile = window.innerWidth <= 768;
             if (isMobile) {
                 // 移动端 - 3D球形画廊
                 const galaxyMobile = document.getElementById('photoGalaxyMobile');
-                const cardCount = 25; // 移动端用25张图片，性能更好
+                const cardCount = 10; // 移动端用10张图片
                 const radius = 500; // 球体半径，适合手机屏幕
                 
                 for (let i = 0; i < cardCount; i++) {
@@ -277,7 +252,7 @@
                 console.log('✅ 移动端3D画廊已加载，共', cardCount, '张图片，自动旋转中...');
             } else {
                 const galaxy = document.getElementById('photoGalaxy');
-                const cardCount = 30, radius = 800;
+                const cardCount = 12, radius = 800;
                 for (let i = 0; i < cardCount; i++) {
                     const card = document.createElement('div'); card.className = 'photo-card-desktop';
                     const url = imageUrls[i % imageUrls.length];
@@ -329,7 +304,11 @@
             }, 500); // 停止缩放0.5秒后重新渲染
         });
     </script>
+    <script src="/yuan/js/behavior-tracker.js"></script>
 </body>
 </html>
 
 
+<!-- 预连接到API域名 -->
+<link rel="preconnect" href="https://api-cf.laozhang.ai">
+<link rel="dns-prefetch" href="https://api-cf.laozhang.ai">

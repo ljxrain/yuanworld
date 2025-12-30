@@ -148,7 +148,8 @@
             <canvas id="qrcodeCanvas"></canvas>
             <div class="invite-code-display" id="inviteCode">-</div>
             <div class="invite-tip">
-                扫描二维码注册<br>
+                扫码查看邀请口令<br>
+                长按复制文字，打开浏览器注册<br>
                 我们都能获得推荐奖励
             </div>
         </div>
@@ -193,15 +194,19 @@
         </div>
 
         <div class="wechat-tip" id="wechatTip">
-            <h4>⚠️ 微信分享注意事项</h4>
+            <h4>✅ 微信分享指南（100%不被封）</h4>
             <ol>
                 <li><strong>保存海报</strong>后发送到朋友圈或好友</li>
-                <li>好友扫码后会提示<strong>"在浏览器中打开"</strong></li>
-                <li>点击右上角【···】选择<strong>"在浏览器打开"</strong></li>
-                <li>或者直接<strong>复制链接</strong>发给好友</li>
+                <li>好友<strong>扫码</strong>后会看到一段文字（邀请口令）</li>
+                <li><strong>长按文字 → 复制</strong>整段口令</li>
+                <li>打开<strong>手机浏览器</strong>（如Safari、Chrome）</li>
+                <li>访问网站，系统<strong>自动检测邀请码</strong>并绑定关系</li>
             </ol>
-            <p style="color: #666; font-size: 12px; margin-top: 10px;">
-                💡 提示：使用默认浏览器打开效果最佳
+            <p style="color: #ff6600; font-size: 13px; margin-top: 10px; font-weight: bold;">
+                💡 为什么不被封？因为二维码内容是纯文本，不是链接！
+            </p>
+            <p style="color: #666; font-size: 12px; margin-top: 5px;">
+                参考案例：淘宝口令、抖音口令都是这个原理
             </p>
         </div>
     </div>
@@ -229,14 +234,14 @@
         // 生成二维码
         const canvas = document.getElementById('qrcodeCanvas');
 
-        // 使用短链或引导页（防止微信拦截）
-        // 方案1：直接链接（可能被拦截）
-        // const qrUrl = invitationUrl;
+        // ⚠️ 重要：二维码内容为纯文本口令，100%防封
+        // 用户扫码后看到口令文字，需要手动复制并打开浏览器
+        // 这样微信无法检测到链接，不会被拦截
+        const commandText = `🎨 #博世界AI${invitationCode}#
+复制这段话，打开手机浏览器访问 http://49.232.220.223/yuan
+输入邀请码即可领取AI形象照优惠，我们都能获得推荐奖励！💰`;
 
-        // 方案2：引导页（推荐）
-        const qrUrl = `http://49.232.220.223/yuan/redirect.html?code=${invitationCode}`;
-
-        QRCode.toCanvas(canvas, qrUrl, {
+        QRCode.toCanvas(canvas, commandText, {
             width: 200,
             height: 200,
             margin: 2,

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分享海报 - 博世界</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .poster-container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .poster-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .poster-header h1 {
+            font-size: 28px;
+            margin: 0 0 10px 0;
+        }
+        .poster-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .qr-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #qrcodeCanvas {
+            margin: 10px 0;
+        }
+        .invite-code-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 3px;
+            margin: 15px 0;
+        }
+        .invite-tip {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .features {
+            color: white;
+            margin-bottom: 20px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .feature-item span:first-child {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        .commission-info {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .commission-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .commission-rates {
+            display: flex;
+            justify-content: space-around;
+        }
+        .rate-item {
+            text-align: center;
+        }
+        .rate-percent {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .rate-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .buttons {
+            display: grid;
+            gap: 10px;
+        }
+        .btn {
+            background: white;
+            color: #667eea;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .wechat-tip {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        .wechat-tip.show {
+            display: block;
+        }
+        .wechat-tip h4 {
+            color: #ff4444;
+            margin: 0 0 10px 0;
+        }
+        .wechat-tip ol {
+            margin: 10px 0;
+            padding-left: 20px;
+            color: #333;
+            font-size: 14px;
+        }
+        .wechat-tip li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="poster-container">
+        <div class="poster-header">
+            <h1>🎨 博世界</h1>
+            <p>AI梦境成真，一键生成专属形象</p>
+        </div>
+
+        <div class="qr-section">
+            <canvas id="qrcodeCanvas"></canvas>
+            <div class="invite-code-display" id="inviteCode">-</div>
+            <div class="invite-tip">
+                扫描二维码注册<br>
+                我们都能获得推荐奖励
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-item">
+                <span>✨</span>
+                <span>AI智能换脸，3秒预览效果</span>
+            </div>
+            <div class="feature-item">
+                <span>🎯</span>
+                <span>海量模板，总有你喜欢的风格</span>
+            </div>
+            <div class="feature-item">
+                <span>🔒</span>
+                <span>隐私保护，照片24小时自动销毁</span>
+            </div>
+        </div>
+
+        <div class="commission-info">
+            <h3>💰 推荐奖励规则</h3>
+            <div class="commission-rates">
+                <div class="rate-item">
+                    <div class="rate-percent">30%</div>
+                    <div class="rate-label">直接推荐</div>
+                </div>
+                <div class="rate-item">
+                    <div class="rate-percent">10%</div>
+                    <div class="rate-label">二级推荐</div>
+                </div>
+                <div class="rate-item">
+                    <div class="rate-percent">5%</div>
+                    <div class="rate-label">三级推荐</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn" onclick="saveAsImage()">💾 保存海报</button>
+            <button class="btn" onclick="copyLink()">📋 复制链接</button>
+            <button class="btn" onclick="showWechatTip()">📱 微信分享指南</button>
+        </div>
+
+        <div class="wechat-tip" id="wechatTip">
+            <h4>⚠️ 微信分享注意事项</h4>
+            <ol>
+                <li><strong>保存海报</strong>后发送到朋友圈或好友</li>
+                <li>好友扫码后会提示<strong>"在浏览器中打开"</strong></li>
+                <li>点击右上角【···】选择<strong>"在浏览器打开"</strong></li>
+                <li>或者直接<strong>复制链接</strong>发给好友</li>
+            </ol>
+            <p style="color: #666; font-size: 12px; margin-top: 10px;">
+                💡 提示：使用默认浏览器打开效果最佳
+            </p>
+        </div>
+    </div>
+
+    <!-- QRCode.js -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+    <!-- html2canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <script>
+        // 从URL获取邀请码
+        const urlParams = new URLSearchParams(window.location.search);
+        const invitationCode = urlParams.get('code');
+        const invitationUrl = urlParams.get('url');
+
+        if (!invitationCode) {
+            alert('缺少邀请码参数');
+            window.close();
+        }
+
+        // 显示邀请码
+        document.getElementById('inviteCode').textContent = invitationCode;
+
+        // 生成二维码
+        const canvas = document.getElementById('qrcodeCanvas');
+
+        // 使用短链或引导页（防止微信拦截）
+        // 方案1：直接链接（可能被拦截）
+        // const qrUrl = invitationUrl;
+
+        // 方案2：引导页（推荐）
+        const qrUrl = `http://49.232.220.223/yuan/redirect.html?code=${invitationCode}`;
+
+        QRCode.toCanvas(canvas, qrUrl, {
+            width: 200,
+            height: 200,
+            margin: 2,
+            color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+            }
+        }, function (error) {
+            if (error) console.error(error);
+        });
+
+        // 保存为图片
+        function saveAsImage() {
+            const poster = document.querySelector('.poster-container');
+
+            html2canvas(poster, {
+                backgroundColor: null,
+                scale: 2,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `博世界邀请海报-${invitationCode}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        // 复制链接
+        function copyLink() {
+            const url = invitationUrl || `http://49.232.220.223/yuan/register.html?code=${invitationCode}`;
+
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ 邀请链接已复制！\n\n您可以直接发送给好友');
+            }).catch(() => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = url;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ 邀请链接已复制！');
+            });
+        }
+
+        // 显示微信分享提示
+        function showWechatTip() {
+            const tip = document.getElementById('wechatTip');
+            tip.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

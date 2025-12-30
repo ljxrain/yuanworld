@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>口令分享 - 博世界</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .code-display {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .code-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .code-value {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .command-box {
+            background: #f5f5f5;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .command-text {
+            color: #333;
+            line-height: 1.8;
+            font-size: 15px;
+            word-break: break-all;
+        }
+
+        .highlight {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .copy-btn.success {
+            background: #52c41a;
+        }
+
+        .guide {
+            background: #fffbe6;
+            border-left: 4px solid #faad14;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .guide h3 {
+            color: #d46b08;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .guide ol {
+            margin-left: 20px;
+            color: #666;
+        }
+
+        .guide li {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .emoji {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 博世界 - 口令分享</h1>
+        <p class="subtitle">复制口令，让好友在浏览器打开，你俩都有奖励</p>
+
+        <!-- 邀请码展示 -->
+        <div class="code-display">
+            <div class="code-title">您的专属邀请码</div>
+            <div class="code-value" id="inviteCode">-</div>
+        </div>
+
+        <!-- 口令文本 -->
+        <div class="command-box">
+            <div class="command-text" id="commandText">
+                <span class="emoji">🎨</span> <span class="highlight">#博世界AI8888#</span><br>
+                复制这段话，打开手机浏览器访问 <span class="highlight">49.232.220.223/yuan</span>，输入邀请码即可领取AI形象照优惠，我们都能获得推荐奖励！💰
+            </div>
+        </div>
+
+        <!-- 复制按钮 -->
+        <button class="copy-btn" id="copyBtn" onclick="copyCommand()">
+            <span>📋</span>
+            <span id="btnText">一键复制口令</span>
+        </button>
+
+        <button class="copy-btn" style="background: #52c41a;" onclick="copyLinkOnly()">
+            <span>🔗</span>
+            <span>只复制链接</span>
+        </button>
+
+        <!-- 使用指南 -->
+        <div class="guide">
+            <h3>📱 微信分享步骤</h3>
+            <ol>
+                <li>点击上方"<strong>一键复制口令</strong>"</li>
+                <li>打开微信，找到要分享的好友或群</li>
+                <li>长按输入框，点击"<strong>粘贴</strong>"</li>
+                <li>发送给好友即可</li>
+            </ol>
+            <p style="color: #d46b08; margin-top: 10px; font-size: 13px;">
+                ✅ 纯文本消息，微信100%不会拦截！
+            </p>
+        </div>
+
+        <!-- 统计数据 -->
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value">30%</div>
+                <div class="stat-label">直推佣金</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">10%</div>
+                <div class="stat-label">二级佣金</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5%</div>
+                <div class="stat-label">三级佣金</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 从URL获取邀请码
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteCode = urlParams.get('code');
+        const inviteUrl = urlParams.get('url') || `http://49.232.220.223/yuan/?code=${inviteCode}`;
+
+        if (!inviteCode) {
+            alert('缺少邀请码参数');
+            window.close();
+        }
+
+        // 显示邀请码
+        document.getElementById('inviteCode').textContent = inviteCode;
+
+        // 生成口令文本
+        const commandText = `🎨 #博世界AI${inviteCode}#\n复制这段话，打开手机浏览器访问 ${inviteUrl}，输入邀请码即可领取AI形象照优惠，我们都能获得推荐奖励！💰`;
+
+        document.getElementById('commandText').innerHTML = commandText
+            .replace(new RegExp(inviteCode, 'g'), `<span class="highlight">${inviteCode}</span>`)
+            .replace(/49\.232\.220\.223\/yuan/g, '<span class="highlight">49.232.220.223/yuan</span>')
+            .replace(/\n/g, '<br>');
+
+        // 复制完整口令
+        function copyCommand() {
+            const btn = document.getElementById('copyBtn');
+            const btnText = document.getElementById('btnText');
+
+            navigator.clipboard.writeText(commandText).then(() => {
+                btn.classList.add('success');
+                btnText.textContent = '✅ 复制成功！';
+
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btnText.textContent = '一键复制口令';
+                }, 2000);
+
+                // 震动反馈（支持的设备）
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }).catch(() => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = commandText;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                btn.classList.add('success');
+                btnText.textContent = '✅ 复制成功！';
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btnText.textContent = '一键复制口令';
+                }, 2000);
+            });
+        }
+
+        // 只复制链接
+        function copyLinkOnly() {
+            navigator.clipboard.writeText(inviteUrl).then(() => {
+                alert('✅ 链接已复制！\n\n您可以直接发送给好友');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = inviteUrl;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ 链接已复制！');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正在跳转 - 博世界</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .wechat-guide {
+            display: none;
+            background: #fff9e6;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .wechat-guide.show {
+            display: block;
+        }
+        .wechat-guide h3 {
+            color: #ff6b00;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .wechat-guide ol {
+            text-align: left;
+            padding-left: 20px;
+            color: #333;
+        }
+        .wechat-guide li {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .arrow-img {
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎨</div>
+        <h1>博世界</h1>
+        <p>AI梦境成真，一键生成专属形象</p>
+
+        <div id="loadingSection">
+            <div class="loading"></div>
+            <p>正在为您打开...</p>
+        </div>
+
+        <button class="btn" id="goButton" onclick="goToTarget()">
+            立即前往
+        </button>
+
+        <div class="wechat-guide" id="wechatGuide">
+            <h3>📱 微信用户请注意</h3>
+            <ol>
+                <li>点击右上角【<strong>···</strong>】菜单</li>
+                <li>选择【<strong>在浏览器中打开</strong>】</li>
+                <li>使用默认浏览器访问效果最佳</li>
+            </ol>
+            <p style="color: #999; font-size: 12px; margin-top: 15px; text-align: center;">
+                或复制链接到浏览器打开
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 获取邀请码
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code') || urlParams.get('c');
+
+        // 目标URL
+        const targetUrl = code
+            ? `http://49.232.220.223/yuan/register.html?code=${code}`
+            : 'http://49.232.220.223/yuan/';
+
+        // 检测是否微信浏览器
+        function isWeChatBrowser() {
+            const ua = navigator.userAgent.toLowerCase();
+            return /micromessenger/.test(ua);
+        }
+
+        // 跳转到目标页面
+        function goToTarget() {
+            window.location.href = targetUrl;
+        }
+
+        // 页面加载逻辑
+        window.addEventListener('DOMContentLoaded', function() {
+            if (isWeChatBrowser()) {
+                // 微信浏览器：显示引导
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('wechatGuide').classList.add('show');
+
+                // 延迟3秒自动跳转（给用户时间看提示）
+                setTimeout(function() {
+                    // 微信浏览器自动跳转可能被拦截，所以只显示按钮
+                    console.log('微信环境，请用户手动点击');
+                }, 3000);
+            } else {
+                // 非微信浏览器：直接跳转
+                setTimeout(function() {
+                    goToTarget();
+                }, 800);
+            }
+        });
+
+        // 尝试自动跳转（非微信环境）
+        if (!isWeChatBrowser()) {
+            // 备用跳转方案
+            setTimeout(function() {
+                if (window.location.href.indexOf('yuan') === -1) {
+                    goToTarget();
+                }
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

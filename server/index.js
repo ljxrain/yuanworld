@@ -14,6 +14,7 @@ const statsRoutes = require('./routes/stats');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payment');
+const distributionRoutes = require('./routes/distribution');
 const templateRoutes = require('./routes/templates');
 const userBehaviorRoutes = require('./routes/user-behavior');
 
@@ -87,6 +88,7 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/distribution', distributionRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/before-after', require('./routes/before-after'));
 app.use('/api/user-behavior', userBehaviorRoutes);

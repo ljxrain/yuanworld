@@ -421,9 +421,8 @@
                 alert('请输入正确的充值金额');
                 return;
             }
-            
-            alert(`充值功能开发中\n\n充值金额: ¥${amount}\n\n支付通道接入后即可使用`);
-            closeRechargeModal();
+            // 跳转到支付页面，传递充值金额参数
+            window.location.href = `/yuan/payment.html?type=balance&amount=${amount}`;
         }
         
         // VIP相关
@@ -447,8 +446,12 @@
         }
         
         async function processVipPurchase() {
-            alert(`VIP购买功能开发中\n\n套餐: ${selectedVipMonths}个月\n价格: ¥${selectedVipPrice}\n\n支付通道接入后即可使用`);
-            closeVipModal();
+            if (!selectedVipMonths || !selectedVipPrice) {
+                alert('请选择VIP套餐');
+                return;
+            }
+            // 跳转到支付页面，传递VIP套餐参数
+            window.location.href = `/yuan/payment.html?type=vip&months=${selectedVipMonths}&price=${selectedVipPrice}`;
         }
         
         // 查看作品

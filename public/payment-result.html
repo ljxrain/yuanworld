@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付结果 - 博世界</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .result-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .result-icon.success {
+            color: #4CAF50;
+        }
+
+        .result-icon.failed {
+            color: #f44336;
+        }
+
+        .result-icon.pending {
+            color: #ff9800;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 32px;
+        }
+
+        .result-message {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .order-info {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .order-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .order-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f4ff;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auto-redirect {
+            margin-top: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .result-container {
+                padding: 30px 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .result-icon {
+                font-size: 60px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div id="result-content">
+            <div class="result-icon pending">⏳</div>
+            <h1>正在查询支付结果...</h1>
+            <div class="result-message">
+                请稍候，正在确认您的支付状态<span class="loading"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        // 显示成功结果
+        function showSuccess(orderData) {
+            const content = `
+                <div class="result-icon success">✅</div>
+                <h1>支付成功！</h1>
+                <div class="result-message">
+                    您的支付已经完成，相关权益已自动开通
+                </div>
+                <div class="order-info">
+                    <div class="order-row">
+                        <span class="order-label">订单号:</span>
+                        <span class="order-value">${orderData.out_trade_no}</span>
+                    </div>
+                    <div class="order-row">
+                        <span class="order-label">商品名称:</span>
+                        <span class="order-value">${orderData.product_name}</span>
+                    </div>
+                    <div class="order-row">
+                        <span class="order-label">支付金额:</span>
+                        <span class="order-value">¥${orderData.amount}</span>
+                    </div>
+                    <div class="order-row">
+                        <span class="order-label">支付方式:</span>
+                        <span class="order-value">${orderData.payment_type === 'alipay' ? '支付宝' : '微信支付'}</span>
+                    </div>
+                    <div class="order-row">
+                        <span class="order-label">支付时间:</span>
+                        <span class="order-value">${new Date(orderData.paid_at).toLocaleString('zh-CN')}</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="window.location.href='/user-center.html'">
+                        返回个人中心
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/index.html'">
+                        返回首页
+                    </button>
+                </div>
+                <div class="auto-redirect">3秒后自动跳转到个人中心...</div>
+            `;
+
+            document.getElementById('result-content').innerHTML = content;
+
+            // 3秒后自动跳转
+            setTimeout(() => {
+                window.location.href = '/user-center.html';
+            }, 3000);
+        }
+
+        // 显示失败结果
+        function showFailed(message = '支付未完成或已取消') {
+            const content = `
+                <div class="result-icon failed">❌</div>
+                <h1>支付失败</h1>
+                <div class="result-message">
+                    ${message}
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="window.location.href='/payment.html'">
+                        重新支付
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/index.html'">
+                        返回首页
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('result-content').innerHTML = content;
+        }
+
+        // 显示待确认状态
+        function showPending(out_trade_no) {
+            const content = `
+                <div class="result-icon pending">⏳</div>
+                <h1>支付处理中</h1>
+                <div class="result-message">
+                    您的支付正在处理中，请稍候片刻...<br>
+                    订单号: ${out_trade_no}
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="checkOrderStatus('${out_trade_no}')">
+                        刷新状态
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/user-center.html'">
+                        返回个人中心
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('result-content').innerHTML = content;
+        }
+
+        // 查询订单状态
+        async function checkOrderStatus(out_trade_no) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showFailed('请先登录');
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 2000);
+                    return;
+                }
+
+                const response = await fetch(`/api/payment/order/${out_trade_no}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    const order = result.data;
+                    if (order.status === 'paid') {
+                        showSuccess(order);
+                    } else if (order.status === 'failed') {
+                        showFailed('支付失败，请重试');
+                    } else {
+                        showPending(out_trade_no);
+                    }
+                } else {
+                    showFailed('查询订单失败');
+                }
+            } catch (error) {
+                console.error('查询订单失败:', error);
+                showFailed('查询订单状态失败，请稍后重试');
+            }
+        }
+
+        // 页面加载时处理
+        window.onload = async function() {
+            const status = getUrlParam('status');
+            const out_trade_no = getUrlParam('out_trade_no');
+            const verified = getUrlParam('verified');
+
+            if (!out_trade_no) {
+                showFailed('订单号不存在');
+                return;
+            }
+
+            // 根据URL参数判断状态
+            if (status === 'success' && verified === 'true') {
+                // 查询完整订单信息
+                await checkOrderStatus(out_trade_no);
+            } else if (status === 'failed') {
+                showFailed('支付失败或已取消');
+            } else if (status === 'error') {
+                showFailed('支付过程出现错误');
+            } else {
+                // 默认查询订单状态
+                await checkOrderStatus(out_trade_no);
+            }
+        };
+    </script>
+</body>
+</html>

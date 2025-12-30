@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>充值中心 - 博世界</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .payment-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+
+        .option-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .option-price {
+            font-size: 32px;
+            color: #667eea;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .option-desc {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .payment-method {
+            margin: 30px 0;
+        }
+
+        .payment-method h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .method-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .method-btn {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .method-btn:hover {
+            border-color: #667eea;
+        }
+
+        .method-btn.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .method-icon {
+            font-size: 32px;
+        }
+
+        .method-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .custom-amount {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .custom-amount.show {
+            display: block;
+        }
+
+        .custom-amount input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .payment-options {
+                grid-template-columns: 1fr;
+            }
+
+            .method-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 充值中心</h1>
+
+        <div class="payment-tabs">
+            <button class="tab-btn active" onclick="switchTab('balance')">余额充值</button>
+            <button class="tab-btn" onclick="switchTab('vip')">VIP会员</button>
+            <button class="tab-btn" onclick="switchTab('preview')">购买预览</button>
+        </div>
+
+        <!-- 余额充值 -->
+        <div id="balance-tab" class="tab-content active">
+            <h2 style="margin-bottom: 20px;">💵 余额充值</h2>
+            <div class="payment-options">
+                <div class="option-card" onclick="selectOption('balance', 10)">
+                    <div class="option-title">体验充值</div>
+                    <div class="option-price">¥10</div>
+                    <div class="option-desc">适合新用户体验</div>
+                </div>
+                <div class="option-card" onclick="selectOption('balance', 50)">
+                    <div class="option-title">小额充值</div>
+                    <div class="option-price">¥50</div>
+                    <div class="option-desc">满足基本需求</div>
+                </div>
+                <div class="option-card" onclick="selectOption('balance', 100)">
+                    <div class="option-title">标准充值</div>
+                    <div class="option-price">¥100</div>
+                    <div class="option-desc">最受欢迎</div>
+                </div>
+                <div class="option-card" onclick="selectOption('balance', 'custom')">
+                    <div class="option-title">自定义</div>
+                    <div class="option-price">¥?</div>
+                    <div class="option-desc">输入金额</div>
+                </div>
+            </div>
+
+            <div class="custom-amount" id="custom-balance">
+                <label>输入充值金额:</label>
+                <input type="number" id="balance-custom-amount" min="1" step="0.01" placeholder="请输入金额">
+            </div>
+
+            <div class="payment-method">
+                <h3>选择支付方式:</h3>
+                <div class="method-buttons">
+                    <div class="method-btn selected" onclick="selectPaymentMethod('alipay')">
+                        <div class="method-icon">💳</div>
+                        <div class="method-name">支付宝</div>
+                    </div>
+                    <div class="method-btn" onclick="selectPaymentMethod('wxpay')">
+                        <div class="method-icon">💚</div>
+                        <div class="method-name">微信支付</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert" id="balance-alert"></div>
+            <div class="loading" id="balance-loading">
+                <div class="loading-spinner"></div>
+                <p>正在创建订单...</p>
+            </div>
+
+            <button class="btn-submit" onclick="submitPayment('balance')">立即充值</button>
+        </div>
+
+        <!-- VIP会员 -->
+        <div id="vip-tab" class="tab-content">
+            <h2 style="margin-bottom: 20px;">👑 VIP会员</h2>
+            <div class="payment-options">
+                <div class="option-card" onclick="selectOption('vip', 30)">
+                    <div class="option-title">月度会员</div>
+                    <div class="option-price">¥30</div>
+                    <div class="option-desc">30天VIP权限</div>
+                </div>
+                <div class="option-card" onclick="selectOption('vip', 88)">
+                    <div class="option-title">季度会员</div>
+                    <div class="option-price">¥88</div>
+                    <div class="option-desc">90天VIP权限 (9折)</div>
+                </div>
+                <div class="option-card" onclick="selectOption('vip', 288)">
+                    <div class="option-title">年度会员</div>
+                    <div class="option-price">¥288</div>
+                    <div class="option-desc">365天VIP权限 (8折)</div>
+                </div>
+            </div>
+
+            <div class="payment-method">
+                <h3>选择支付方式:</h3>
+                <div class="method-buttons">
+                    <div class="method-btn selected" onclick="selectPaymentMethod('alipay')">
+                        <div class="method-icon">💳</div>
+                        <div class="method-name">支付宝</div>
+                    </div>
+                    <div class="method-btn" onclick="selectPaymentMethod('wxpay')">
+                        <div class="method-icon">💚</div>
+                        <div class="method-name">微信支付</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert" id="vip-alert"></div>
+            <div class="loading" id="vip-loading">
+                <div class="loading-spinner"></div>
+                <p>正在创建订单...</p>
+            </div>
+
+            <button class="btn-submit" onclick="submitPayment('vip')">开通VIP</button>
+        </div>
+
+        <!-- 购买预览 -->
+        <div id="preview-tab" class="tab-content">
+            <h2 style="margin-bottom: 20px;">🔍 购买预览次数</h2>
+            <div class="payment-options">
+                <div class="option-card" onclick="selectOption('preview', 10)">
+                    <div class="option-title">10次预览</div>
+                    <div class="option-price">¥5</div>
+                    <div class="option-desc">体验套餐</div>
+                </div>
+                <div class="option-card" onclick="selectOption('preview', 50)">
+                    <div class="option-title">50次预览</div>
+                    <div class="option-price">¥20</div>
+                    <div class="option-desc">标准套餐</div>
+                </div>
+                <div class="option-card" onclick="selectOption('preview', 100)">
+                    <div class="option-title">100次预览</div>
+                    <div class="option-price">¥35</div>
+                    <div class="option-desc">超值套餐</div>
+                </div>
+            </div>
+
+            <div class="payment-method">
+                <h3>选择支付方式:</h3>
+                <div class="method-buttons">
+                    <div class="method-btn selected" onclick="selectPaymentMethod('alipay')">
+                        <div class="method-icon">💳</div>
+                        <div class="method-name">支付宝</div>
+                    </div>
+                    <div class="method-btn" onclick="selectPaymentMethod('wxpay')">
+                        <div class="method-icon">💚</div>
+                        <div class="method-name">微信支付</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert" id="preview-alert"></div>
+            <div class="loading" id="preview-loading">
+                <div class="loading-spinner"></div>
+                <p>正在创建订单...</p>
+            </div>
+
+            <button class="btn-submit" onclick="submitPayment('preview')">立即购买</button>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'balance';
+        let selectedAmount = null;
+        let selectedProductId = null;
+        let paymentMethod = 'alipay';
+
+        // 页面加载时处理URL参数
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            const amount = urlParams.get('amount');
+            const months = urlParams.get('months');
+            const price = urlParams.get('price');
+
+            if (type) {
+                // 切换到对应的标签页
+                if (type === 'balance' || type === 'vip' || type === 'preview') {
+                    currentTab = type;
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelector(`[onclick="switchTab('${type}')"]`)?.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${type}-tab`)?.classList.add('active');
+                }
+
+                // 预设金额
+                if (type === 'balance' && amount) {
+                    const amountValue = parseFloat(amount);
+                    selectedAmount = amountValue;
+
+                    // 如果有匹配的预设选项，选中它
+                    const presetOptions = [50, 100, 200, 500];
+                    const matchingOption = presetOptions.find(opt => opt === amountValue);
+                    if (matchingOption) {
+                        document.querySelectorAll('#balance-tab .option-card').forEach((card, idx) => {
+                            if (idx < presetOptions.length && presetOptions[idx] === matchingOption) {
+                                card.classList.add('selected');
+                            }
+                        });
+                    } else {
+                        // 使用自定义金额
+                        document.querySelector('#balance-tab .option-card:last-child')?.classList.add('selected');
+                        const customDiv = document.getElementById('custom-balance');
+                        if (customDiv) {
+                            customDiv.classList.add('show');
+                            const customInput = document.getElementById('balance-custom-amount');
+                            if (customInput) customInput.value = amountValue;
+                        }
+                    }
+                }
+
+                // 预设VIP套餐
+                if (type === 'vip' && months && price) {
+                    const priceValue = parseFloat(price);
+                    const monthsValue = parseInt(months);
+                    selectedAmount = priceValue;
+
+                    // 根据月份选择对应的VIP选项
+                    const vipMap = { 1: 30, 3: 88, 12: 288 };
+                    const matchingPrice = vipMap[monthsValue];
+                    if (matchingPrice) {
+                        const vipDays = { 30: 30, 88: 90, 288: 365 };
+                        selectedProductId = vipDays[matchingPrice];
+
+                        document.querySelectorAll('#vip-tab .option-card').forEach((card, idx) => {
+                            const prices = [30, 88, 288];
+                            if (prices[idx] === matchingPrice) {
+                                card.classList.add('selected');
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+        // 切换标签页
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // 更新标签按钮
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 更新内容
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tab}-tab`).classList.add('active');
+
+            // 重置选择
+            selectedAmount = null;
+            selectedProductId = null;
+            document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+        }
+
+        // 选择套餐
+        function selectOption(type, value) {
+            // 移除所有选中状态
+            document.querySelectorAll(`#${type}-tab .option-card`).forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // 添加选中状态
+            event.currentTarget.classList.add('selected');
+
+            if (value === 'custom') {
+                // 显示自定义金额输入
+                document.getElementById(`custom-${type}`).classList.add('show');
+                selectedAmount = null;
+                selectedProductId = null;
+            } else {
+                // 隐藏自定义金额输入
+                const customDiv = document.getElementById(`custom-${type}`);
+                if (customDiv) {
+                    customDiv.classList.remove('show');
+                }
+
+                // 设置金额和产品ID
+                if (type === 'balance') {
+                    selectedAmount = value;
+                    selectedProductId = null;
+                } else if (type === 'vip') {
+                    const vipDays = { 30: 30, 88: 90, 288: 365 };
+                    selectedAmount = value;
+                    selectedProductId = vipDays[value];
+                } else if (type === 'preview') {
+                    const previewPrices = { 10: 5, 50: 20, 100: 35 };
+                    selectedAmount = previewPrices[value];
+                    selectedProductId = value;
+                }
+            }
+        }
+
+        // 选择支付方式
+        function selectPaymentMethod(method) {
+            paymentMethod = method;
+            document.querySelectorAll('.method-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        // 显示提示
+        function showAlert(type, message, isError = false) {
+            const alertDiv = document.getElementById(`${type}-alert`);
+            alertDiv.className = `alert ${isError ? 'alert-error' : 'alert-success'} show`;
+            alertDiv.textContent = message;
+
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // 显示/隐藏加载状态
+        function toggleLoading(type, show) {
+            const loadingDiv = document.getElementById(`${type}-loading`);
+            if (show) {
+                loadingDiv.classList.add('show');
+            } else {
+                loadingDiv.classList.remove('show');
+            }
+        }
+
+        // 提交支付
+        async function submitPayment(type) {
+            try {
+                // 获取金额
+                let amount = selectedAmount;
+                if (!amount) {
+                    const customInput = document.getElementById(`${type}-custom-amount`);
+                    if (customInput && customInput.value) {
+                        amount = parseFloat(customInput.value);
+                    }
+                }
+
+                // 验证
+                if (!amount || amount <= 0) {
+                    showAlert(type, '请选择或输入金额', true);
+                    return;
+                }
+
+                if (!paymentMethod) {
+                    showAlert(type, '请选择支付方式', true);
+                    return;
+                }
+
+                // 获取token
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showAlert(type, '请先登录', true);
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 1500);
+                    return;
+                }
+
+                // 显示加载状态
+                toggleLoading(type, true);
+
+                // 构建请求数据
+                const productNames = {
+                    balance: `余额充值 ¥${amount}`,
+                    vip: `VIP会员 ${selectedProductId}天`,
+                    preview: `预览次数 ${selectedProductId}次`
+                };
+
+                const requestData = {
+                    payment_type: paymentMethod,
+                    amount: amount,
+                    product_name: productNames[type],
+                    product_type: type,
+                    product_id: selectedProductId ? String(selectedProductId) : null,
+                    device: /mobile/i.test(navigator.userAgent) ? 'mobile' : 'pc'
+                };
+
+                // 发送请求
+                const response = await fetch('/yuan/api/payment/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                toggleLoading(type, false);
+
+                if (result.success && result.data.pay_url) {
+                    // 跳转到支付页面
+                    window.location.href = result.data.pay_url;
+                } else {
+                    showAlert(type, result.message || '创建订单失败', true);
+                }
+
+            } catch (error) {
+                console.error('支付失败:', error);
+                toggleLoading(type, false);
+                showAlert(type, '支付请求失败，请重试', true);
+            }
+        }
+    </script>
+</body>
+</html>

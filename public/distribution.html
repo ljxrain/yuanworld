@@ -206,13 +206,32 @@
                 <p>分享给好友，TA注册后您将获得佣金奖励</p>
                 <div class="invite-code-display" id="invitationCode">加载中...</div>
                 <div class="invite-url" id="invitationUrl">-</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px;">
-                    <button class="btn" onclick="openCommandShare()" style="background: #ff6b6b;">📋 口令分享（推荐）</button>
-                    <button class="btn btn-secondary" onclick="generateDynamicQRCode()">🔥 活码海报（防封）</button>
+
+                <!-- 分享方式说明 -->
+                <div style="background: rgba(144,238,144,0.1); border-radius: 10px; padding: 15px; margin: 15px 0; border-left: 4px solid var(--main-color);">
+                    <h4 style="margin: 0 0 10px 0; color: var(--main-color); font-size: 0.95rem;">💡 选择合适的分享方式</h4>
+                    <div style="font-size: 0.85rem; color: #666; line-height: 1.6;">
+                        <p style="margin: 5px 0;">📋 <strong>口令分享</strong>：微信群/朋友圈（100%防封）</p>
+                        <p style="margin: 5px 0;">🔥 <strong>活码海报</strong>：线下推广/朋友圈（可切换域名）</p>
+                        <p style="margin: 5px 0;">🖼️ <strong>普通海报</strong>：微信分享（口令二维码，防封）</p>
+                        <p style="margin: 5px 0;">🔗 <strong>直接链接</strong>：QQ/短信/邮件（一键打开）</p>
+                    </div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-secondary" onclick="generateQRCode()">🖼️ 普通海报</button>
-                    <button class="btn btn-secondary" onclick="copyInviteLink()">🔗 复制链接</button>
+
+                <!-- 分享按钮 -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <button class="btn" onclick="openCommandShare()" style="background: #ff6b6b;">
+                        📋 口令分享<br><span style="font-size: 0.75rem; opacity: 0.8;">微信推荐</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateDynamicQRCode()">
+                        🔥 活码海报<br><span style="font-size: 0.75rem; opacity: 0.8;">可切换域名</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateQRCode()">
+                        🖼️ 普通海报<br><span style="font-size: 0.75rem; opacity: 0.8;">口令二维码</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="shareDirectLink()">
+                        🔗 直接链接<br><span style="font-size: 0.75rem; opacity: 0.8;">QQ/短信适用</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -377,6 +396,21 @@
             // 打开口令分享页面
             const commandUrl = `/yuan/invite-code-share.html?code=${code}&url=${encodeURIComponent(url)}`;
             window.open(commandUrl, '_blank', 'width=500,height=700');
+        }
+
+        // 方案4：直接链接分享（适合QQ、短信、邮件等非微信场景）
+        function shareDirectLink() {
+            const code = document.getElementById('invitationCode').textContent;
+            const url = document.getElementById('invitationUrl').textContent;
+
+            if (!code || code === '加载中...') {
+                alert('请稍等，正在加载邀请码...');
+                return;
+            }
+
+            // 打开直接链接分享页面
+            const directLinkUrl = `/yuan/direct-link-share.html?code=${code}&url=${encodeURIComponent(url)}`;
+            window.open(directLinkUrl, '_blank', 'width=500,height=700');
         }
 
         // 生成二维码海报

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>直接链接分享 - 博世界</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .link-preview {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px dashed #667eea;
+        }
+        .link-preview h3 {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+        .link-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 13px;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 15px;
+        }
+        .invite-code-display {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 3px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+        }
+        .share-text-preview {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .share-text-preview h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .share-text-content {
+            color: #555;
+            line-height: 1.8;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-primary.success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .btn-secondary:hover {
+            background: #f5f5ff;
+        }
+        .tips {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .tips h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .tips ul {
+            margin-left: 20px;
+            color: #555;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .tips li {
+            margin: 5px 0;
+        }
+        .scenario-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .scenario-badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="badge">🔗 方案4：直接链接分享</div>
+
+        <div class="header">
+            <h1>📱 一键打开链接</h1>
+            <p>适合QQ、短信、邮件等非微信场景</p>
+        </div>
+
+        <div class="invite-code-display" id="inviteCode">加载中...</div>
+
+        <!-- 链接预览 -->
+        <div class="link-preview">
+            <h3>📋 邀请链接（点击即可注册）</h3>
+            <div class="link-text" id="inviteLink">加载中...</div>
+            <button class="btn btn-primary" id="copyLinkBtn" onclick="copyLink()">
+                <span id="copyLinkText">📋 复制链接</span>
+            </button>
+        </div>
+
+        <!-- 推荐的分享文案 -->
+        <div class="share-text-preview">
+            <h4>💬 推荐分享文案（可自行修改）</h4>
+            <div class="share-text-content" id="shareText">加载中...</div>
+            <button class="btn btn-secondary" onclick="copyShareText()" style="margin-top: 12px;">
+                📝 复制文案+链接
+            </button>
+        </div>
+
+        <!-- 适用场景 -->
+        <div class="tips">
+            <h4>✅ 适用场景</h4>
+            <div class="scenario-badges">
+                <span class="scenario-badge">💬 QQ聊天</span>
+                <span class="scenario-badge">📱 短信</span>
+                <span class="scenario-badge">📧 邮件</span>
+                <span class="scenario-badge">🌐 论坛</span>
+                <span class="scenario-badge">📝 博客</span>
+            </div>
+            <ul style="margin-top: 12px;">
+                <li>✓ 用户点击链接直接打开，自动绑定邀请关系</li>
+                <li>✓ 无需复制粘贴，操作最简单</li>
+                <li>✗ 不适合微信（微信会拦截外部链接）</li>
+            </ul>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="tips" style="background: #fff3e0; margin-top: 15px;">
+            <h4 style="color: #f57c00;">📖 使用说明</h4>
+            <ul>
+                <li><strong>QQ聊天</strong>：直接复制链接发送，好友点击即可</li>
+                <li><strong>短信</strong>：复制"文案+链接"一起发送，更有吸引力</li>
+                <li><strong>邮件</strong>：可以在邮件正文插入链接，或作为超链接</li>
+                <li><strong>论坛/博客</strong>：可以放在签名档或文章中</li>
+            </ul>
+        </div>
+
+        <!-- 对比微信方案 -->
+        <div class="tips" style="background: #ffebee; margin-top: 15px;">
+            <h4 style="color: #d32f2f;">⚠️ 微信分享请使用其他方案</h4>
+            <ul>
+                <li>微信会拦截外部链接，显示"已停止访问该网页"</li>
+                <li>请使用"📋 口令分享"（100%防封）</li>
+                <li>或使用"🖼️ 普通海报"（口令二维码）</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 从URL获取参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteCode = urlParams.get('code');
+        const inviteUrl = urlParams.get('url');
+
+        if (!inviteCode || !inviteUrl) {
+            alert('缺少必要参数');
+            window.close();
+        }
+
+        // 显示邀请码
+        document.getElementById('inviteCode').textContent = inviteCode;
+        document.getElementById('inviteLink').textContent = inviteUrl;
+
+        // 生成分享文案
+        const shareText = `🎨 【博世界AI形象照】邀请你一起体验！
+
+✨ 3秒生成专属AI形象照
+🎯 海量模板任你选择
+💰 推荐好友还能赚佣金
+
+👉 点击链接立即体验：
+${inviteUrl}
+
+邀请码：${inviteCode}
+我们都能获得奖励哦！💰`;
+
+        document.getElementById('shareText').textContent = shareText;
+
+        // 复制链接
+        function copyLink() {
+            const btn = document.getElementById('copyLinkBtn');
+            const btnText = document.getElementById('copyLinkText');
+
+            navigator.clipboard.writeText(inviteUrl).then(() => {
+                btn.classList.add('success');
+                btnText.textContent = '✅ 链接已复制！';
+
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btnText.textContent = '📋 复制链接';
+                }, 2000);
+            }).catch(() => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = inviteUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                btn.classList.add('success');
+                btnText.textContent = '✅ 链接已复制！';
+            });
+        }
+
+        // 复制文案+链接
+        function copyShareText() {
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('✅ 分享文案已复制！\n\n您可以直接发送到QQ、短信或邮件中');
+            }).catch(() => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = shareText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ 分享文案已复制！');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -93,6 +93,11 @@ app.use('/api/templates', templateRoutes);
 app.use('/api/before-after', require('./routes/before-after'));
 app.use('/api/user-behavior', userBehaviorRoutes);
 
+// 活码系统路由
+const dynamicQRCodeRoutes = require('./routes/dynamic-qrcode');
+app.use('/api/qrcode', dynamicQRCodeRoutes);
+app.use('/', dynamicQRCodeRoutes); // 短链接跳转 /q/:code
+
 // 健康检查端点（用于Docker和负载均衡器）
 app.get('/health', async (req, res) => {
     try {

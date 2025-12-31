@@ -207,10 +207,13 @@
                 <div class="invite-code-display" id="invitationCode">加载中...</div>
                 <div class="invite-url" id="invitationUrl">-</div>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px;">
-                    <button class="btn" onclick="openCommandShare()" style="background: #ff6b6b;">📋 口令分享（防封100%）</button>
-                    <button class="btn btn-secondary" onclick="generateQRCode()">🖼️ 海报二维码</button>
+                    <button class="btn" onclick="openCommandShare()" style="background: #ff6b6b;">📋 口令分享（推荐）</button>
+                    <button class="btn btn-secondary" onclick="generateDynamicQRCode()">🔥 活码海报（防封）</button>
                 </div>
-                <button class="btn" onclick="copyInviteLink()" style="margin-top: 10px;">🔗 复制链接</button>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-secondary" onclick="generateQRCode()">🖼️ 普通海报</button>
+                    <button class="btn btn-secondary" onclick="copyInviteLink()">🔗 复制链接</button>
+                </div>
             </div>
         </div>
 
@@ -439,6 +442,45 @@
             } catch (error) {
                 console.error('提现申请失败:', error);
                 alert('提现申请失败，请重试');
+            }
+        }
+
+        // 生成活码海报（动态二维码，可后台切换域名）
+        async function generateDynamicQRCode() {
+            const code = document.getElementById('invitationCode').textContent;
+            const url = document.getElementById('invitationUrl').textContent;
+
+            if (!code || code === '加载中...') {
+                alert('请等待邀请码加载完成');
+                return;
+            }
+
+            try {
+                // 调用后端API创建活码
+                const response = await fetch('/yuan/api/qrcode/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        invitationCode: code,
+                        targetUrl: url
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 使用活码短链接生成二维码海报
+                    const qrcodeUrl = `/yuan/dynamic-qrcode-poster.html?code=${code}&shortUrl=${encodeURIComponent(result.shortUrl)}&qrcodeId=${result.qrcodeId}`;
+                    window.open(qrcodeUrl, '_blank', 'width=500,height=800');
+                } else {
+                    alert(result.message || '生成活码失败');
+                }
+            } catch (error) {
+                console.error('生成活码失败:', error);
+                alert('生成活码失败，请重试');
             }
         }
     </script>

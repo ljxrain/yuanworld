@@ -730,5 +730,87 @@ router.put('/templates/:id', async (req, res) => {
     }
 });
 
+/**
+ * 下载高清图（扣费）
+ * POST /api/generate/download/:generationId
+ */
+router.post('/download/:generationId', authenticateToken, async (req, res) => {
+    try {
+        const { generationId } = req.params;
+        const userId = req.user.id;
+
+        // 查询生成记录
+        const generation = await Generation.findOne({
+            where: {
+                id: generationId,
+                user_id: userId
+            }
+        });
+
+        if (!generation) {
+            return res.status(404).json({
+                success: false,
+                message: '未找到生成记录'
+            });
+        }
+
+        if (generation.status !== 'completed') {
+            return res.status(400).json({
+                success: false,
+                message: '图片尚未生成完成'
+            });
+        }
+
+        // 如果已经支付过，直接返回图片URL
+        if (generation.is_paid) {
+            return res.json({
+                success: true,
+                message: '已支付，直接下载',
+                imageUrl: generation.preview_image_url,
+                alreadyPaid: true
+            });
+        }
+
+        // 检查用户余额
+        const user = await req.user.reload();
+        const downloadPrice = 5; // ¥5下载高清图
+
+        if (user.balance < downloadPrice) {
+            return res.status(402).json({
+                success: false,
+                message: '余额不足',
+                balance: user.balance,
+                required: downloadPrice
+            });
+        }
+
+        // 扣除余额
+        user.balance -= downloadPrice;
+        await user.save();
+
+        // 标记为已支付
+        generation.is_paid = true;
+        generation.payment_amount = downloadPrice;
+        await generation.save();
+
+        console.log(`[Download] 用户 ${user.username} 下载图片 ${generationId}，扣费 ¥${downloadPrice}`);
+
+        res.json({
+            success: true,
+            message: '下载成功',
+            imageUrl: generation.preview_image_url,
+            deducted: downloadPrice,
+            remainingBalance: user.balance
+        });
+
+    } catch (error) {
+        console.error('Download failed:', error);
+        res.status(500).json({
+            success: false,
+            message: '下载失败：' + error.message
+        });
+    }
+});
+
 module.exports = router;
 

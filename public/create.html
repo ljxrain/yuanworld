@@ -1285,8 +1285,71 @@
                 alert('生成ID丢失，无法下载');
                 return;
             }
-            
-            alert('下载功能开发中...\n生成ID: ' + currentGenerationId);
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('请先登录');
+                showLoginModal();
+                return;
+            }
+
+            try {
+                // 检查余额
+                const userResponse = await fetch('/yuan/api/user/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userResponse.json();
+
+                if (!userData.success) {
+                    throw new Error('获取用户信息失败');
+                }
+
+                const balance = userData.user.balance || 0;
+                const downloadPrice = 5; // ¥5下载高清图
+
+                if (balance < downloadPrice) {
+                    // 余额不足，跳转支付
+                    if (confirm(`余额不足！当前余额：¥${balance}\n下载高清图需要：¥${downloadPrice}\n\n是否前往充值？`)) {
+                        window.location.href = `/yuan/payment.html?type=balance&amount=${downloadPrice}`;
+                    }
+                    return;
+                }
+
+                // 余额充足，确认扣费
+                if (!confirm(`下载高清图将扣除 ¥${downloadPrice}\n当前余额：¥${balance}\n确认下载？`)) {
+                    return;
+                }
+
+                // 调用下载API
+                const downloadResponse = await fetch(`/yuan/api/generate/download/${currentGenerationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const downloadData = await downloadResponse.json();
+
+                if (!downloadResponse.ok) {
+                    throw new Error(downloadData.message || '下载失败');
+                }
+
+                // 下载成功，打开图片
+                if (downloadData.imageUrl) {
+                    window.open(downloadData.imageUrl, '_blank');
+                    alert(`下载成功！已扣除 ¥${downloadPrice}\n剩余余额：¥${balance - downloadPrice}`);
+
+                    // 刷新用户信息
+                    checkLoginStatus();
+                } else {
+                    throw new Error('未获取到图片URL');
+                }
+
+            } catch (error) {
+                console.error('下载失败:', error);
+                alert('下载失败：' + error.message);
+            }
         }
         
         // 登录
@@ -1392,8 +1455,71 @@
                 alert('生成ID丢失，无法下载');
                 return;
             }
-            
-            alert('下载功能开发中...\n生成ID: ' + currentGenerationId);
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('请先登录');
+                showLoginModal();
+                return;
+            }
+
+            try {
+                // 检查余额
+                const userResponse = await fetch('/yuan/api/user/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userResponse.json();
+
+                if (!userData.success) {
+                    throw new Error('获取用户信息失败');
+                }
+
+                const balance = userData.user.balance || 0;
+                const downloadPrice = 5; // ¥5下载高清图
+
+                if (balance < downloadPrice) {
+                    // 余额不足，跳转支付
+                    if (confirm(`余额不足！当前余额：¥${balance}\n下载高清图需要：¥${downloadPrice}\n\n是否前往充值？`)) {
+                        window.location.href = `/yuan/payment.html?type=balance&amount=${downloadPrice}`;
+                    }
+                    return;
+                }
+
+                // 余额充足，确认扣费
+                if (!confirm(`下载高清图将扣除 ¥${downloadPrice}\n当前余额：¥${balance}\n确认下载？`)) {
+                    return;
+                }
+
+                // 调用下载API
+                const downloadResponse = await fetch(`/yuan/api/generate/download/${currentGenerationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const downloadData = await downloadResponse.json();
+
+                if (!downloadResponse.ok) {
+                    throw new Error(downloadData.message || '下载失败');
+                }
+
+                // 下载成功，打开图片
+                if (downloadData.imageUrl) {
+                    window.open(downloadData.imageUrl, '_blank');
+                    alert(`下载成功！已扣除 ¥${downloadPrice}\n剩余余额：¥${balance - downloadPrice}`);
+
+                    // 刷新用户信息
+                    checkLoginStatus();
+                } else {
+                    throw new Error('未获取到图片URL');
+                }
+
+            } catch (error) {
+                console.error('下载失败:', error);
+                alert('下载失败：' + error.message);
+            }
         }
         
         // 登录

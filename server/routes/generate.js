@@ -463,7 +463,7 @@ router.post(
                 perfLog.watermarkEnd = Date.now();
                 console.log(`⏱️ [性能] 水印添加耗时: ${perfLog.watermarkEnd - perfLog.imageSaveEnd}ms`);
 
-                const previewImageUrl = `/images/generations/previews/${previewFileName}`;
+                const previewImageUrl = `/yuan/images/generations/previews/${previewFileName}`;
 
                 // 计算生成耗时（秒）
                 const processingTime = Math.round((Date.now() - startTime) / 1000);

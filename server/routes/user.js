@@ -3,6 +3,41 @@ const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const { Generation, User } = require('../models');
 
+// 获取当前用户信息
+router.get('/me', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: '用户不存在'
+            });
+        }
+
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                balance: user.balance || 0,
+                free_previews: user.free_previews || 0,
+                is_vip: user.is_vip || false,
+                vip_expiry: user.vip_expiry || null,
+                created_at: user.created_at
+            }
+        });
+    } catch (error) {
+        console.error('获取用户信息失败:', error);
+        res.status(500).json({
+            success: false,
+            message: '获取用户信息失败'
+        });
+    }
+});
+
 // 获取用户的所有生成记录
 router.get('/generations', authenticateToken, async (req, res) => {
     try {

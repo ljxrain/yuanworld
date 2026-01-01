@@ -510,6 +510,15 @@
     </div>
     
     <script>
+        // 版本检查 - 强制刷新缓存
+        const CURRENT_VERSION = '2026-01-01-v2';
+        const storedVersion = localStorage.getItem('create_page_version');
+        if (storedVersion !== CURRENT_VERSION) {
+            console.log('检测到新版本，清除缓存并刷新...');
+            localStorage.setItem('create_page_version', CURRENT_VERSION);
+            location.reload(true);
+        }
+
         // 全局变量
         let currentMode = null; // 'template' or 'freestyle'
         let selectedTemplateId = null;

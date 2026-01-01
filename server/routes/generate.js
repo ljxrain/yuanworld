@@ -464,6 +464,7 @@ router.post(
                 console.log(`⏱️ [性能] 水印添加耗时: ${perfLog.watermarkEnd - perfLog.imageSaveEnd}ms`);
 
                 const previewImageUrl = `/yuan/images/generations/previews/${previewFileName}`;
+                const originalImageUrl = `/yuan/images/generations/originals/${originalFileName}`;
 
                 // 计算生成耗时（秒）
                 const processingTime = Math.round((Date.now() - startTime) / 1000);
@@ -471,6 +472,7 @@ router.post(
                 generation.status = 'completed';
                 generation.completed_at = new Date();
                 generation.preview_image_url = previewImageUrl;
+                generation.high_quality_image_url = originalImageUrl;
                 generation.original_image_path = originalFilePath;
                 generation.processing_time = processingTime;
                 await generation.save();
@@ -761,12 +763,12 @@ router.post('/download/:generationId', authenticateToken, async (req, res) => {
             });
         }
 
-        // 如果已经支付过，直接返回图片URL
+        // 如果已经支付过，直接返回高清图片URL
         if (generation.is_paid) {
             return res.json({
                 success: true,
                 message: '已支付，直接下载',
-                imageUrl: generation.preview_image_url,
+                imageUrl: generation.high_quality_image_url || generation.preview_image_url,
                 alreadyPaid: true
             });
         }
@@ -798,7 +800,7 @@ router.post('/download/:generationId', authenticateToken, async (req, res) => {
         res.json({
             success: true,
             message: '下载成功',
-            imageUrl: generation.preview_image_url,
+            imageUrl: generation.high_quality_image_url || generation.preview_image_url,
             deducted: downloadPrice,
             remainingBalance: user.balance
         });

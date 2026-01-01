@@ -14,7 +14,7 @@ const statsRoutes = require('./routes/stats');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payment');
-const distributionRoutes = require('./routes/distribution');
+const { router: distributionRoutes } = require('./routes/distribution');
 const templateRoutes = require('./routes/templates');
 const userBehaviorRoutes = require('./routes/user-behavior');
 

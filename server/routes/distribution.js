@@ -665,5 +665,7 @@ router.get('/withdrawals', authenticateToken, async (req, res) => {
 });
 
 // 导出路由和佣金计算函数
-router.calculateAndDistributeCommission = calculateAndDistributeCommission;
-module.exports = router;
+module.exports = {
+    router,
+    calculateAndDistributeCommission
+};

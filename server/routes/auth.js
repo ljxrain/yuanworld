@@ -4,6 +4,7 @@ const Joi = require('joi');
 const { Op } = require('sequelize');
 const { User } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
+const { sendVerificationCode, verifyCode } = require('../services/verification');
 
 const router = express.Router();
 
@@ -287,6 +288,70 @@ router.get('/verify', authenticateToken, (req, res) => {
         valid: true,
         user: req.user.toSafeObject()
     });
+});
+
+/**
+ * 发送验证码
+ * POST /api/auth/send-verification-code
+ */
+router.post('/send-verification-code', async (req, res) => {
+    try {
+        const { type, target, purpose } = req.body;
+
+        // 参数验证
+        if (!type || !target || !purpose) {
+            return res.status(400).json({
+                success: false,
+                message: '缺少必要参数'
+            });
+        }
+
+        // 检查注册时目标是否已被使用
+        if (purpose === 'register') {
+            if (type === 'email') {
+                const existing = await User.findOne({ where: { email: target } });
+                if (existing) {
+                    return res.status(409).json({
+                        success: false,
+                        message: '该邮箱已被注册'
+                    });
+                }
+            } else if (type === 'sms') {
+                const existing = await User.findOne({ where: { phone: target } });
+                if (existing) {
+                    return res.status(409).json({
+                        success: false,
+                        message: '该手机号已被注册'
+                    });
+                }
+            }
+        }
+
+        // 发送验证码
+        const result = await sendVerificationCode({
+            type,
+            target,
+            purpose,
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+
+        res.json({
+            success: true,
+            message: result.message,
+            data: {
+                expires_in: result.expiresIn,
+                can_resend_in: 60
+            }
+        });
+
+    } catch (error) {
+        console.error('发送验证码失败:', error);
+        res.status(400).json({
+            success: false,
+            message: error.message || '发送验证码失败'
+        });
+    }
 });
 
 module.exports = router;

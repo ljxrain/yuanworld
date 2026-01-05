@@ -494,10 +494,44 @@
                 </div>
             
             <div id="registerForm" class="hidden">
-                <input type="text" id="registerUsername" class="form-input" placeholder="用户名（必填，至少2个字符）">
-                <input type="email" id="registerEmail" class="form-input" placeholder="邮箱（可选，例如：user@example.com）">
-                <input type="password" id="registerPassword" class="form-input" placeholder="密码（必填，至少6个字符）">
-                <input type="password" id="registerPasswordConfirm" class="form-input" placeholder="确认密码">
+                <!-- 注册方式选择 -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button id="emailRegType" class="btn btn-primary" style="flex: 1;" onclick="switchRegType('email')">邮箱注册</button>
+                    <button id="phoneRegType" class="btn btn-secondary" style="flex: 1;" onclick="switchRegType('phone')">手机号注册</button>
+                </div>
+
+                <!-- 邮箱注册表单 -->
+                <div id="emailRegForm">
+                    <input type="email" id="registerEmail" class="form-input" placeholder="邮箱地址（必填）" required>
+
+                    <!-- 验证码输入 -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="emailVerificationCode" class="form-input" placeholder="邮箱验证码（必填）" maxlength="6" style="flex: 1;">
+                        <button id="sendEmailCodeBtn" class="btn btn-secondary" onclick="sendVerificationCode('email')" style="width: 120px; white-space: nowrap;">获取验证码</button>
+                    </div>
+
+                    <input type="text" id="registerUsername" class="form-input" placeholder="用户名（必填，至少2个字符）">
+                    <input type="password" id="registerPassword" class="form-input" placeholder="密码（必填，至少6个字符）">
+                    <input type="password" id="registerPasswordConfirm" class="form-input" placeholder="确认密码">
+                    <input type="text" id="registerInviterCode" class="form-input" placeholder="邀请码（选填）">
+                </div>
+
+                <!-- 手机号注册表单 -->
+                <div id="phoneRegForm" class="hidden">
+                    <input type="tel" id="registerPhone" class="form-input" placeholder="手机号（必填）" maxlength="11" required>
+
+                    <!-- 验证码输入 -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="phoneVerificationCode" class="form-input" placeholder="短信验证码（必填）" maxlength="6" style="flex: 1;">
+                        <button id="sendPhoneCodeBtn" class="btn btn-secondary" onclick="sendVerificationCode('phone')" style="width: 120px; white-space: nowrap;">获取验证码</button>
+                    </div>
+
+                    <input type="text" id="registerUsernamePhone" class="form-input" placeholder="用户名（必填，至少2个字符）">
+                    <input type="password" id="registerPasswordPhone" class="form-input" placeholder="密码（必填，至少6个字符）">
+                    <input type="password" id="registerPasswordConfirmPhone" class="form-input" placeholder="确认密码">
+                    <input type="text" id="registerInviterCodePhone" class="form-input" placeholder="邀请码（选填）">
+                </div>
+
                 <div class="btn-group">
                     <button class="btn btn-secondary" onclick="closeAuthModal()">取消</button>
                     <button class="btn btn-primary" onclick="register()">注册</button>
@@ -1175,71 +1209,182 @@
             console.log('✅ 结果显示完成！图片URL:', imageUrl);
         }
 
-        async function register() {
-            const username = document.getElementById('registerUsername').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-            
-            // 必填项验证
-            if (!username || !password || !passwordConfirm) {
-                alert('请填写必填字段：\n- 用户名\n- 密码\n- 确认密码');
+        // 当前注册类型（email 或 phone）
+        let currentRegType = 'email';
+
+        // 切换注册类型
+        function switchRegType(type) {
+            currentRegType = type;
+
+            if (type === 'email') {
+                document.getElementById('emailRegForm').classList.remove('hidden');
+                document.getElementById('phoneRegForm').classList.add('hidden');
+                document.getElementById('emailRegType').classList.remove('btn-secondary');
+                document.getElementById('emailRegType').classList.add('btn-primary');
+                document.getElementById('phoneRegType').classList.remove('btn-primary');
+                document.getElementById('phoneRegType').classList.add('btn-secondary');
+            } else {
+                document.getElementById('emailRegForm').classList.add('hidden');
+                document.getElementById('phoneRegForm').classList.remove('hidden');
+                document.getElementById('emailRegType').classList.remove('btn-primary');
+                document.getElementById('emailRegType').classList.add('btn-secondary');
+                document.getElementById('phoneRegType').classList.remove('btn-secondary');
+                document.getElementById('phoneRegType').classList.add('btn-primary');
+            }
+        }
+
+        // 发送验证码
+        async function sendVerificationCode(type) {
+            const target = type === 'email'
+                ? document.getElementById('registerEmail').value.trim()
+                : document.getElementById('registerPhone').value.trim();
+
+            if (!target) {
+                alert(type === 'email' ? '请输入邮箱地址' : '请输入手机号');
                 return;
             }
-            
-            // 用户名验证
-            if (username.length < 2) {
-                alert('用户名至少需要2个字符');
-                return;
-            }
-            
-            // 邮箱验证（如果填写了）
-            if (email) {
+
+            // 验证格式
+            if (type === 'email') {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    alert('邮箱格式不正确\n\n请输入有效的邮箱地址，例如：\nuser@example.com\n或者留空不填写邮箱');
+                if (!emailRegex.test(target)) {
+                    alert('邮箱格式不正确');
+                    return;
+                }
+            } else {
+                const phoneRegex = /^1[3-9]\d{9}$/;
+                if (!phoneRegex.test(target)) {
+                    alert('手机号格式不正确');
                     return;
                 }
             }
-            
-            // 密码验证
-            if (password.length < 6) {
-                alert('密码至少需要6个字符');
-                return;
-                }
-            
-            if (password !== passwordConfirm) {
-                alert('两次密码输入不一致');
-                return;
-            }
+
+            const btnId = type === 'email' ? 'sendEmailCodeBtn' : 'sendPhoneCodeBtn';
+            const btn = document.getElementById(btnId);
 
             try {
-                // 构建注册数据（如果邮箱为空就不发送）
-                const registerData = { username, password };
-                if (email) {
-                    registerData.email = email;
-                }
-                
-                const response = await fetch('/yuan/api/auth/register', {
+                btn.disabled = true;
+                btn.textContent = '发送中...';
+
+                const response = await fetch('/yuan/api/auth/send-verification-code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(registerData)
+                    body: JSON.stringify({
+                        type: type === 'email' ? 'email' : 'sms',
+                        target: target,
+                        purpose: 'register'
+                    })
                 });
 
                 const data = await response.json();
-                
-                if (!response.ok) {
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || '发送失败');
+                }
+
+                alert('验证码已发送，请查收！');
+
+                // 60秒倒计时
+                let countdown = 60;
+                const timer = setInterval(() => {
+                    countdown--;
+                    btn.textContent = `${countdown}秒后重试`;
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.textContent = '重新获取';
+                    }
+                }, 1000);
+
+            } catch (error) {
+                alert('发送验证码失败：' + error.message);
+                btn.disabled = false;
+                btn.textContent = '获取验证码';
+            }
+        }
+
+        // 注册（支持验证码）
+        async function register() {
+            try {
+                let registrationData;
+
+                if (currentRegType === 'email') {
+                    const email = document.getElementById('registerEmail').value.trim();
+                    const code = document.getElementById('emailVerificationCode').value.trim();
+                    const username = document.getElementById('registerUsername').value.trim();
+                    const password = document.getElementById('registerPassword').value;
+                    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+                    const inviterCode = document.getElementById('registerInviterCode').value.trim();
+
+                    if (!email || !code || !username || !password || !passwordConfirm) {
+                        alert('请填写所有必填项');
+                        return;
+                    }
+
+                    if (password !== passwordConfirm) {
+                        alert('两次密码输入不一致');
+                        return;
+                    }
+
+                    registrationData = {
+                        registration_type: 'email',
+                        email: email,
+                        verification_code: code,
+                        username: username,
+                        password: password,
+                        inviter_code: inviterCode || undefined
+                    };
+                } else {
+                    const phone = document.getElementById('registerPhone').value.trim();
+                    const code = document.getElementById('phoneVerificationCode').value.trim();
+                    const username = document.getElementById('registerUsernamePhone').value.trim();
+                    const password = document.getElementById('registerPasswordPhone').value;
+                    const passwordConfirm = document.getElementById('registerPasswordConfirmPhone').value;
+                    const inviterCode = document.getElementById('registerInviterCodePhone').value.trim();
+
+                    if (!phone || !code || !username || !password || !passwordConfirm) {
+                        alert('请填写所有必填项');
+                        return;
+                    }
+
+                    if (password !== passwordConfirm) {
+                        alert('两次密码输入不一致');
+                        return;
+                    }
+
+                    registrationData = {
+                        registration_type: 'phone',
+                        phone: phone,
+                        verification_code: code,
+                        username: username,
+                        password: password,
+                        inviter_code: inviterCode || undefined
+                    };
+                }
+
+                const response = await fetch('/yuan/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registrationData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
                     throw new Error(data.message || '注册失败');
                 }
-                
+
                 console.log('✅ 注册成功');
+                alert('注册成功！');
+
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
-                
+
                 closeAuthModal();
                 checkLoginStatus();
-                
+
             } catch (error) {
+                console.error('注册错误:', error);
                 alert('注册失败：' + error.message);
             }
         }

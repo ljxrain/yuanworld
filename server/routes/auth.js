@@ -43,19 +43,73 @@ const generateToken = (userId) => {
     );
 };
 
-// 用户注册
+// 用户注册（支持验证码）
 router.post('/register', async (req, res) => {
     try {
-        // 验证输入
-        const { error, value } = registerSchema.validate(req.body);
-        if (error) {
+        const {
+            registration_type,  // 'phone' 或 'email'
+            phone,             // 手机号（type=phone时必填）
+            email,             // 邮箱（type=email时必填）
+            verification_code, // 验证码（必填）
+            username,
+            password,
+            inviter_code       // 邀请码（可选）
+        } = req.body;
+
+        // 参数验证
+        if (!username || !password) {
             return res.status(400).json({
-                message: '输入验证失败',
-                details: error.details.map(d => d.message)
+                success: false,
+                message: '用户名和密码为必填项'
             });
         }
 
-        const { username, email, password } = value;
+        if (username.length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: '用户名至少需要2个字符'
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: '密码至少需要6个字符'
+            });
+        }
+
+        // 验证注册方式
+        if (!registration_type || (registration_type !== 'phone' && registration_type !== 'email')) {
+            return res.status(400).json({
+                success: false,
+                message: '请选择注册方式（手机号或邮箱）'
+            });
+        }
+
+        // 获取验证目标
+        const target = registration_type === 'phone' ? phone : email;
+        if (!target) {
+            return res.status(400).json({
+                success: false,
+                message: registration_type === 'phone' ? '请输入手机号' : '请输入邮箱'
+            });
+        }
+
+        // 验证码验证
+        if (!verification_code) {
+            return res.status(400).json({
+                success: false,
+                message: '请输入验证码'
+            });
+        }
+
+        const codeVerification = await verifyCode(target, verification_code, 'register');
+        if (!codeVerification.valid) {
+            return res.status(400).json({
+                success: false,
+                message: codeVerification.message
+            });
+        }
 
         // 检查用户名是否已存在
         const existingUser = await User.findOne({
@@ -64,19 +118,26 @@ router.post('/register', async (req, res) => {
 
         if (existingUser) {
             return res.status(409).json({
+                success: false,
                 message: '用户名已被使用'
             });
         }
 
-        // 如果提供了邮箱，检查邮箱是否已被注册
-        if (email && email.trim()) {
-            const existingEmail = await User.findOne({
-                where: { email }
-            });
-
+        // 检查手机号或邮箱是否已被注册
+        if (registration_type === 'phone') {
+            const existingPhone = await User.findOne({ where: { phone } });
+            if (existingPhone) {
+                return res.status(409).json({
+                    success: false,
+                    message: '该手机号已被注册'
+                });
+            }
+        } else {
+            const existingEmail = await User.findOne({ where: { email } });
             if (existingEmail) {
                 return res.status(409).json({
-                    message: '邮箱已被注册'
+                    success: false,
+                    message: '该邮箱已被注册'
                 });
             }
         }
@@ -84,14 +145,52 @@ router.post('/register', async (req, res) => {
         // 创建新用户
         const user = await User.create({
             username,
-            email,
-            password
+            password,
+            phone: registration_type === 'phone' ? phone : null,
+            email: registration_type === 'email' ? email : null,
+            phone_verified: registration_type === 'phone',
+            email_verified: registration_type === 'email',
+            registration_type
         });
+
+        console.log(`✅ 新用户注册成功: ${username}, ${registration_type}: ${target}`);
+
+        // 如果有邀请码，绑定邀请关系
+        if (inviter_code && inviter_code.trim()) {
+            try {
+                const { sequelize } = require('../models');
+
+                // 查找邀请人
+                const [inviters] = await sequelize.query(`
+                    SELECT id FROM users WHERE invitation_code = :code
+                `, {
+                    replacements: { code: inviter_code.trim() }
+                });
+
+                if (inviters.length > 0 && inviters[0].id !== user.id) {
+                    // 绑定邀请关系
+                    await sequelize.query(`
+                        UPDATE users SET inviter_code = :code WHERE id = :userId
+                    `, {
+                        replacements: {
+                            code: inviter_code.trim(),
+                            userId: user.id
+                        }
+                    });
+
+                    console.log(`✅ 邀请关系绑定成功: ${username} → 邀请码 ${inviter_code}`);
+                }
+            } catch (error) {
+                console.error('绑定邀请码失败:', error);
+                // 不影响注册，继续
+            }
+        }
 
         // 生成token
         const token = generateToken(user.id);
 
         res.status(201).json({
+            success: true,
             message: '注册成功',
             user: user.toSafeObject(),
             token
@@ -99,7 +198,10 @@ router.post('/register', async (req, res) => {
 
     } catch (error) {
         console.error('注册错误:', error);
-        res.status(500).json({ message: '服务器内部错误' });
+        res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
     }
 });
 

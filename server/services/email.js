@@ -22,7 +22,7 @@ let transporter = null;
 
 function createTransporter() {
     try {
-        transporter = nodemailer.createTransporter(EMAIL_CONFIG);
+        transporter = nodemailer.createTransport(EMAIL_CONFIG);
         console.log('✅ 邮件服务初始化成功');
         return transporter;
     } catch (error) {
